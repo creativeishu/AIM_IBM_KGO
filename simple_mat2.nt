@@ -1,20 +1,38 @@
 _:Solid <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Solid" .
 _:Liquid <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Liquid" .
-_:Iron <http://materialdb.org/rdf#melting-point> "1811 K" .
-_:Iron <http://materialdb.org/rdf#boiling-point> "3134 K" .
+
+_:T200 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "200-300 K" .
+_:T300 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "300-400 K" .
+_:T400 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "300-400 K" .
+_:T500 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "400-500 K" .
+_:T600 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "600-700 K" .
+_:T1000 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "1000-1500 K" .
+_:T1500 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "1500-2000 K" .
+_:T2500 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "2500-3000 K" .
+_:T3000 <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "3000-3500 K" .
+
+
+_:Iron <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Iron" .
+_:Iron <http://materialdb.org/rdf#melting-point> _:T1500 .
+_:Iron <http://materialdb.org/rdf#boiling-point> _:T3000 .
 _:Iron <http://materialdb.org/rdf#phase> _:Solid .
-_:Copper <http://materialdb.org/rdf#melting-point> "1358 K" .
-_:Copper <http://materialdb.org/rdf#boiling-point> "2835 K" .
+_:Copper <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Copper" .
+_:Copper <http://materialdb.org/rdf#melting-point> _:T1000 .
+_:Copper <http://materialdb.org/rdf#boiling-point> _:T2500 .
 _:Copper <http://materialdb.org/rdf#phase>  _:Solid .
-_:Cobalt <http://materialdb.org/rdf#melting-point> "1768 K" .
-_:Cobalt <http://materialdb.org/rdf#boiling-point> "3200 K" .
+_:Cobalt <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Cobalt" .
+_:Cobalt <http://materialdb.org/rdf#melting-point> _:T1500 .
+_:Cobalt <http://materialdb.org/rdf#boiling-point> _:T3000 .
 _:Cobalt <http://materialdb.org/rdf#phase>  _:Solid .
-_:Nickel <http://materialdb.org/rdf#melting-point> "1728 K" .
-_:Nickel <http://materialdb.org/rdf#boiling-point> "3003 K" .
+_:Nickel <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Nickel" .
+_:Nickel <http://materialdb.org/rdf#melting-point> _:T1500 .
+_:Nickel <http://materialdb.org/rdf#boiling-point> _:T3000 .
 _:Nickel <http://materialdb.org/rdf#phase>  _:Solid .
-_:Mercury <http://materialdb.org/rdf#melting-point> "234.3210 K" .
-_:Mercury <http://materialdb.org/rdf#boiling-point> "629.88 K" .
+_:Mercury <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Mercury" .
+_:Mercury <http://materialdb.org/rdf#melting-point> _:T200 .
+_:Mercury <http://materialdb.org/rdf#boiling-point> _:T600 .
 _:Mercury <http://materialdb.org/rdf#phase>  _:Liquid .
-_:Bromine <http://materialdb.org/rdf#melting-point> "265.8 K" .
-_:Bromine <http://materialdb.org/rdf#boiling-point> "332.0 K" .
+_:Bromine <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Bromine" .
+_:Bromine <http://materialdb.org/rdf#melting-point> _:T200 .
+_:Bromine <http://materialdb.org/rdf#boiling-point> _:T300 .
 _:Bromine <http://materialdb.org/rdf#phase> _:Liquid .
