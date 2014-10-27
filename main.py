@@ -3,14 +3,19 @@
 
 import sys
 import json
-import wikipedia as wp
+import pywikibot as pwb
+from   pywikibot import pagegenerators
 
 
 def main(args):
     print "#getting periodic table"
     
-    periodic_table = wp.page("List of Elements")
-    print periodic_table.title
-    print periodic_table.links
+    site = pwb.Site()
+    pt_category = pwb.Category(site,'Category:Chemical elements')
+
+    elements_gen = pwb.pagegenerators.CategorizedPageGenerator(pt_category)
+
+    for el in  elements_gen:
+        print el.title()
 
 main(sys.argv[1:])
