@@ -1,18 +1,18 @@
-Iron melting-point "1811 K"
-Iron boiling-point "3134 K"
-Iron phase "Solid"
-Copper melting-point "1358 K"
-Copper boiling-point "2835 K"
-Copper phase "Solid"
-Cobalt melting-point "1768 K"
-Cobalt boiling-point "3200 K"
-Cobalt phase "Solid"
-Nickel melting-point "1728 K"
-Nickel boiling-point "3003 K"
-Nickel phase "Solid"
-Mercury melting-point "234.3210 K"
-Mercury boiling-point "629.88 K"
-Mercury phase "Liquid"
-Bromine melting-point "265.8 K"
-Bromine boiling-point "332.0 K"
-Bromine phase "Liquid"
+_:Iron <http://materialdb.org/rdf#melting-point> "1811 K" .
+_:Iron <http://materialdb.org/rdf#boiling-point> "3134 K" .
+_:Iron <http://materialdb.org/rdf#phase> "Solid" .
+_:Copper <http://materialdb.org/rdf#melting-point> "1358 K" .
+_:Copper <http://materialdb.org/rdf#boiling-point> "2835 K" .
+_:Copper <http://materialdb.org/rdf#phase> "Solid" .
+_:Cobalt <http://materialdb.org/rdf#melting-point> "1768 K" .
+_:Cobalt <http://materialdb.org/rdf#boiling-point> "3200 K" .
+_:Cobalt <http://materialdb.org/rdf#phase> "Solid" .
+_:Nickel <http://materialdb.org/rdf#melting-point> "1728 K" .
+_:Nickel <http://materialdb.org/rdf#boiling-point> "3003 K" .
+_:Nickel <http://materialdb.org/rdf#phase> "Solid" .
+_:Mercury <http://materialdb.org/rdf#melting-point> "234.3210 K" .
+_:Mercury <http://materialdb.org/rdf#boiling-point> "629.88 K" .
+_:Mercury <http://materialdb.org/rdf#phase> "Liquid" .
+_:Bromine <http://materialdb.org/rdf#melting-point> "265.8 K" .
+_:Bromine <http://materialdb.org/rdf#boiling-point> "332.0 K" .
+_:Bromine <http://materialdb.org/rdf#phase> "Liquid" .
