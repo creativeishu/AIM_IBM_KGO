@@ -1,0 +1,20 @@
+_:Solid <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Solid" .
+_:Liquid <http://www.w3.org/1999/02/22-rdf-syntax-ns#label> "Liquid" .
+_:Iron <http://materialdb.org/rdf#melting-point> "1811 K" .
+_:Iron <http://materialdb.org/rdf#boiling-point> "3134 K" .
+_:Iron <http://materialdb.org/rdf#phase> _:Solid .
+_:Copper <http://materialdb.org/rdf#melting-point> "1358 K" .
+_:Copper <http://materialdb.org/rdf#boiling-point> "2835 K" .
+_:Copper <http://materialdb.org/rdf#phase>  _:Solid .
+_:Cobalt <http://materialdb.org/rdf#melting-point> "1768 K" .
+_:Cobalt <http://materialdb.org/rdf#boiling-point> "3200 K" .
+_:Cobalt <http://materialdb.org/rdf#phase>  _:Solid .
+_:Nickel <http://materialdb.org/rdf#melting-point> "1728 K" .
+_:Nickel <http://materialdb.org/rdf#boiling-point> "3003 K" .
+_:Nickel <http://materialdb.org/rdf#phase>  _:Solid .
+_:Mercury <http://materialdb.org/rdf#melting-point> "234.3210 K" .
+_:Mercury <http://materialdb.org/rdf#boiling-point> "629.88 K" .
+_:Mercury <http://materialdb.org/rdf#phase>  _:Liquid .
+_:Bromine <http://materialdb.org/rdf#melting-point> "265.8 K" .
+_:Bromine <http://materialdb.org/rdf#boiling-point> "332.0 K" .
+_:Bromine <http://materialdb.org/rdf#phase> _:Liquid .
