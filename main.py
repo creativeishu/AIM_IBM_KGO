@@ -11,16 +11,30 @@ import wikipedia as wp
 
 
 def main(args):
+    exclusionlist = ["rticle","ikiped","language"]
     print "#getting periodic table"
     
     #output_to_file("test.txt",[["s","p","o"], ["x","y","z"]])
 
-    periodic_table = wp.page("Category:Chemical elements")
 
-    pages =  get_pages_in_category("Chemical elements")
-    for x in pages :
-        print x
+    #first get the periodic table of elements
+    periodic_table =  get_pages_in_category("Chemical elements")
 
+    excluded=False 
+    for el in periodic_table[:15] :
+        element_page = wp.page(el)
+        this_elements_categories = element_page.categories
+        print el, ": ",
+        for cat in this_elements_categories:
+            for excl in exclusionlist:
+                if excl in cat: 
+                    excluded=True
+            if not (excluded):
+                print cat,",",
+            excluded=False
+        print ""
+        #now our node-edge-node is
+        # element   memberof  this_elements_categories[i]
 
 
 
@@ -38,7 +52,7 @@ def get_pages_in_category(cat_name):
 def wiki_request(params):
     API_URL = 'http://en.wikipedia.org/w/api.php'
     RATE_LIMIT = False
-    RATE_LIMIT_MIN_WAIT = None
+    RATE_LIMIT_MIN_WAIT = 3
     RATE_LIMIT_LAST_CALL = None
     USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
 
