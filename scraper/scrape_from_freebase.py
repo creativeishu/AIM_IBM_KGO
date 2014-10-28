@@ -18,7 +18,7 @@ def main(args):
     while(cursor<stopping_count):
         hits,cursor, data = get_result_bunch(cursor)
         if (cursor==1):
-            print "Found {0:6d} hits".format(hits)
+            print "#Found {0:6d} hits".format(hits)
         data_to_files(data,pf,ef)
 
 
@@ -43,18 +43,23 @@ def get_result_bunch(cursor):
 
 def data_to_files(data, pf, ef):
     """take the json result and print it to the two files"""
+    key_exclusion_list = [
+            "url./common/topic/topic_equivalent_webpage" ,   #just crap translations of the webpage
+                        ]
 
     for p in data:
+        nodeprops={}
         if 'output' in p and 'all' in p['output']:
             for k,v in p['output']['all'].items():
-                nodeprops={}
+                if k in key_exclusion_list: continue  #skip excluded keys
                 for vi in v:
                     if type(vi) == dict and 'mid' in vi:
                         ef.add_entry(p['mid'],k,vi['mid'])
                         #print p['mid'], '<%s>'%k, vi['mid'] # links
                     else:
                         #print p['mid'], '<%s>'%k, vi # node properties
-                        nodeprops['k'] = vi
-                pf.add_entry(p['mid'],nodeprops)
+ #                      print k
+                        nodeprops[k] = vi
+        pf.add_entry(p['mid'],nodeprops)
 
 main(sys.argv[1:])
