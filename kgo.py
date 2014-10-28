@@ -118,6 +118,8 @@ for x1 in G.nodes:
 	for x2 in G.nodes:
 		if (x1 != x2):
 			G.add_edge(x1, x2, 0.05)
+
+			
 #print len(G.edges)
 # print G.node_attributes['Iron']
 #print G.allAttributes
