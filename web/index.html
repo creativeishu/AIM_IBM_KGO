@@ -1,0 +1,47 @@
+<html>
+
+<head>
+    <link href="libs/vis/vis.css" rel="stylesheet" type="text/css" />
+    <script src="libs/vis/vis.min.js"></script>
+    <script src="libs/jquery-1.11.1.min.js"></script>
+    
+    <script>
+    $(function (){
+        var container = document.getElementById('mygraph');
+        var network = new vis.Network(container,{},{ physics: {barnesHut: {springLength:75, springConstant:0.015}}
+                                                    });
+        
+        $( "#search-form" ).submit(function( event ) {
+            
+            var val = $("#node-search-field").val();
+            $.ajax({type: "GET", url: 'http://127.0.0.1/test.txt'}).done(function(data) {
+              network.setOptions({
+                                    stabilize: false
+                                 });
+              network.setData({
+                                dot: data
+                              });
+            });
+            
+          event.preventDefault();
+        });
+        
+        
+    });
+    </script>
+</head>
+
+<body>
+    <h1>Material DB</h1>
+    
+    <form id="search-form" action="#">
+    <p>
+        <input id="node-search-field" name="node" type="text" />
+        <input type="submit" value="load!" />
+    </p>
+    </form>
+    
+    <div id="mygraph"></div>
+
+</body>
+</html>
