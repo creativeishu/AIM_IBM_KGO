@@ -1,13 +1,13 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
-#include <iostream>
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <cassert>
 #include <exception>
 #include <set>
+#include <iostream>
 
 #include "parse.hpp"
 
@@ -68,7 +68,7 @@ public:
     }
   }  
 
-  std::string query_graph(const std::string& query, const std::size_t depth)
+  std::string query_graph(const std::string& query, const std::size_t depth) const
   {
     const std::size_t index(find_node(query));
 
@@ -85,7 +85,7 @@ public:
 
 private:
 
-  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph)
+  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
   {
     sub_graph += ' ' + nodes_[index].name_;
     used_indices.insert(index);
@@ -95,7 +95,7 @@ private:
           build_sub_graph(a,depth-1,used_indices,sub_graph);
   }
 
-  std::size_t find_node(const std::string& query)
+  std::size_t find_node(const std::string& query) const
   {
     const auto it(std::lower_bound(nodes_.begin(),nodes_.end(),query));
     try{
