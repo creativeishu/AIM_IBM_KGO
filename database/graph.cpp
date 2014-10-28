@@ -49,7 +49,7 @@ public:
     });
 
     std::sort(nodes_.begin(),nodes_.end());
-  }
+  }  
 
   graph query_graph(const std::string& query, const std::size_t depth)
   {
@@ -64,6 +64,21 @@ public:
   void insert_node(const node_type& node)
   {
     nodes_.push_back(node);
+  }
+
+  std::string convert_graph() const
+  {
+    std::vector<std::pair<std::size_t,std::size_t> > edges;
+
+    // for(const auto a )
+
+    const auto edges(sub_graph.get_edges());
+
+    std::string out;
+    for(const auto& edge : edges)
+      out += ;
+    
+    return out;
   }
 
 private:
@@ -109,7 +124,6 @@ std::string get_query()
 
 std::string convert_graph(const graph& sub_graph)
 {
-  //TODO
 }
 
 int main()
@@ -120,7 +134,7 @@ int main()
   const std::string query(get_query());
   const graph sub_graph(G.query_graph(query,depth));
 
-  const std::string sub_graph_str(convert_graph(sub_graph));
+  const std::string sub_graph_str(sub_graph.convert_graph());
 
   return 0;
 }
