@@ -26,6 +26,7 @@ public:
   {}
 
   bool operator<(const node_type& in) const {return ((this->name_).compare(in.name_) < 0);}
+  bool operator==(const node_type& in) const {return this->name_ == in.name_;}
 
   std::vector<double> properties_;
   std::string name_;
@@ -43,12 +44,23 @@ public:
   {
     EdgeFile ef(graph_file);
 
-    ef.load([this] (const std::string & s, const std::string &, const std::string &) {
+    std::vector<std::pair<std::string,std::string> > edges;
+    ef.load([this] (const std::string & s, const std::string &, const std::string &v) {
       this->nodes_.push_back(node(s, std::vector<double>()));
-      return true; // always continue with parsing
+      this->nodes_.push_back(node(v, std::vector<double>()));
+      edges.push_back(std::make_pair(s,v));
+      return true;
     });
 
+    std::set<node_type> nodes_set(nodes_.begin(),nodes_.end());
+    nodes_.assign(nodes_set.begin(),nodes_set.end());
     std::sort(nodes_.begin(),nodes_.end());
+
+    for(const auto& edge : edges){
+      const std::size_t ind0(find_node(edge.first));
+      const std::size_t ind1(find_node(edge.second));
+      nodes_[ind0].neighbours.push_back(ind1);
+    }
   }  
 
   graph query_graph(const std::string& query, const std::size_t depth)
@@ -68,6 +80,8 @@ public:
 
   std::string convert_graph() const
   {
+    //TODO
+
     std::vector<std::pair<std::size_t,std::size_t> > edges;
 
     // for(const auto a )
@@ -120,10 +134,6 @@ std::string get_query()
 {
   std::string query(/*fetch query from web interface*/);
   return query;
-}
-
-std::string convert_graph(const graph& sub_graph)
-{
 }
 
 int main()
