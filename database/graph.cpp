@@ -5,6 +5,8 @@
 #include <cassert>
 #include <exception>
 
+#include "parse.hpp"
+
 class not_in_database: public std::exception
 {
   virtual const char* what() const throw()
@@ -39,7 +41,12 @@ public:
 
   graph(const std::string& graph_file)
   {
-    //TODO: parse graph file
+    EdgeFile ef(graph_file);
+
+    ef.load([this] (const std::string & s, const std::string &, const std::string &) {
+      this->nodes_.push_back(node(s, std::vector<double>()));
+      return true; // always continue with parsing
+    });
 
     std::sort(nodes_.begin(),nodes_.end());
   }
