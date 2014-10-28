@@ -3,6 +3,15 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
+#include <exception>
+
+class not_in_database: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Item not in database";
+  }
+} not_found;
 
 class node
 {
@@ -63,9 +72,14 @@ private:
 
   std::size_t find_node(const std::string& query)
   {
-    const auto it(std::lower_bound(nodes_.begin(),nodes_.end(),query));
-    assert(it != nodes_.end());
-    return std::distance(nodes_.begin(),it);
+    try{
+      const auto it(std::lower_bound(nodes_.begin(),nodes_.end(),query));
+      if(it == nodes_.end()) throw not_found;
+      return std::distance(nodes_.begin(),it);
+    }
+    catch(std::exception& e){
+      std::cout << e.what() << '\n';
+    }
   }
 
   //*******
