@@ -56,6 +56,7 @@ def get_contents_for_cat(category,ef,rec_level=0,inclusionlist=[],visited_cat=[]
         if not el in visited_pages:
             try:
                 element_page = wp.page(el)
+                visited_pages.append(el)
             except DisambiguationError:
                 continue 
             except PageError:
@@ -78,7 +79,7 @@ def get_contents_for_cat(category,ef,rec_level=0,inclusionlist=[],visited_cat=[]
                 visited_cat.append(cat)
                 print cat,
                 if (rec_level<=3):
-                    visited_cat = get_contents_for_cat(cat,ef,rec_level,inclusionlist,visited_cat,visited_pages)
+                    visited_cat,visited_pages = get_contents_for_cat(cat,ef,rec_level,inclusionlist,visited_cat,visited_pages)
             included=False
     print ""
     return visited_cat,visited_pages
