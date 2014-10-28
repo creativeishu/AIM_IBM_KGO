@@ -1,1 +1,2 @@
-*.pcy
+*.py[co]
+__pychache__
