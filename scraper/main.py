@@ -12,7 +12,7 @@ from serialization_helpers import *
 
 
 def main(args):
-    exclusionlist = ["rticle","ikiped","language"]
+    exclusionlist = ["rticle","ikiped","language", "dmy"]
     print "#getting periodic table"
     
     #output_to_file("test.txt",[["s","p","o"], ["x","y","z"]])
@@ -23,14 +23,14 @@ def main(args):
 
     with EdgeFile(edge_file_name, True) as ef:
         excluded=False 
-        for el in periodic_table[5:30] :
+        for el in periodic_table[5:]:
             element_page = wp.page(el)
             this_elements_categories = element_page.categories
             for cat in this_elements_categories:
                 for excl in exclusionlist:
                     if excl in cat: 
                         excluded=True
-                if not (excluded):
+                if not (excluded or el==cat):
                     ef.add_entry(el,"is member of", cat)
                 excluded=False
         #now our node-edge-node is
@@ -51,8 +51,8 @@ def get_pages_in_category(cat_name):
 
 def wiki_request(params):
     API_URL = 'http://en.wikipedia.org/w/api.php'
-    RATE_LIMIT = False
-    RATE_LIMIT_MIN_WAIT = 3
+    RATE_LIMIT = True
+    RATE_LIMIT_MIN_WAIT = 1 
     RATE_LIMIT_LAST_CALL = None
     USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
 
