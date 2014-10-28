@@ -13,17 +13,17 @@ class not_in_database: public std::exception
   }
 } not_found;
 
-struct node
+struct node_type
 {
 
 public:
 
-  node(const std::string& name, const std::vector<double>& properties)
+  node_type(const std::string& name, const std::vector<double>& properties)
     : name_(name)
     , properties_(properties)
   {}
 
-  bool operator<(const node& in) const {return ((this->name_).compare(in.name_) < 0);}
+  bool operator<(const node_type& in) const {return ((this->name_).compare(in.name_) < 0);}
 
   std::vector<double> properties_;
   std::string name_;
@@ -49,16 +49,21 @@ public:
     const std::size_t index(find_node(query));
 
     std::set<std::size_t> used_indices;
-    std::vector<node> sub_graph;
+    graph sub_graph;
     build_sub_graph(index,depth,used_indices,sub_graph);
     return sub_graph;
   }
 
+  void insert_node(const node_type& node)
+  {
+    nodes_.push_back(node);
+  }
+
 private:
 
-  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::vector<node>& sub_graph)
+  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, graph& sub_graph)
   {
-    sub_graph.push_back(nodes_[index]);
+    sub_graph.insert_node(nodes_[index]);
     used_indices.insert(index);
     if(depth > 0)
       for(const auto a : nodes_[index].neighbours_)
@@ -80,7 +85,7 @@ private:
 
   //*******
 
-  std::vector<node> nodes_;
+  std::vector<node_type> nodes_;
 };
 
 /*
@@ -95,6 +100,11 @@ std::string get_query()
   return query;
 }
 
+std::string convert_graph(const graph& sub_graph)
+{
+  //TODO
+}
+
 int main()
 {
   const std::size_t depth(3);
@@ -102,6 +112,8 @@ int main()
   const graph G(graph_file);
   const std::string query(get_query());
   const graph sub_graph(G.query_graph(query,depth));
+
+  const std::string sub_graph_str(convert_graph(sub_graph));
 
   return 0;
 }
