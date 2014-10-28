@@ -35,6 +35,8 @@ public:
   graph(const std::string& graph_file)
   {
     //TODO: parse graph file
+
+    std::sort(nodes_.begin(),nodes_.end());
   }
 
   graph query_graph(const std::string& query, const std::size_t depth)
@@ -71,13 +73,6 @@ private:
   std::vector<node> nodes_;
 };
 
-graph_type parse_graph()
-{
-  //TODO
-
-  std::sort(graph.begin(),graph.end());
-}
-
 /*
   binning. nodes are neighbours if values are in the same bin
   const std::size_t num_bins(100);
@@ -101,12 +96,7 @@ int main()
 
   const std::string query(get_query());
 
-  G.query(query);
-
-  const graph_type graph(parse_graph());
-
-
-  const graph_type sub_graph(build_sub_graph(query,depth));
+  const graph sub_graph(G.query_graph(query,depth));
 
   return 0;
 }
