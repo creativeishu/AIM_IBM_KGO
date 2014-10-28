@@ -1,3 +1,6 @@
+#ifndef GRAPH_HPP
+#define GRAPH_HPP
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -27,6 +30,7 @@ public:
   {}
 
   bool operator<(const node_type& in) const {return ((this->name_).compare(in.name_) < 0);}
+  bool operator<(const std::string& in) const {return ((this->name_).compare(in) < 0);}
   bool operator==(const node_type& in) const {return this->name_ == in.name_;}
 
   std::vector<double> properties_;
@@ -47,11 +51,11 @@ public:
 
     std::vector<std::pair<std::string,std::string> > edges;
     ef.load([this, &edges] (const std::string & s, const std::string &, const std::string &v) {
-      this->nodes_.push_back(node_type(s), std::vector<double>());
-      this->nodes_.push_back(node_type(v), std::vector<double>());
-      edges.push_back(std::make_pair(s,v));
-      return true;
-    });
+        this->nodes_.push_back(node_type(s, std::vector<double>()));
+        this->nodes_.push_back(node_type(v, std::vector<double>()));
+        edges.push_back(std::make_pair(s,v));
+        return true;
+      });
 
     std::set<node_type> nodes_set(nodes_.begin(),nodes_.end());
     nodes_.assign(nodes_set.begin(),nodes_set.end());
@@ -64,12 +68,12 @@ public:
     }
   }  
 
-  graph query_graph(const std::string& query, const std::size_t depth)
+  std::string query_graph(const std::string& query, const std::size_t depth)
   {
     const std::size_t index(find_node(query));
 
     std::set<std::size_t> used_indices;
-    graph sub_graph;
+    std::string sub_graph;
     build_sub_graph(index,depth,used_indices,sub_graph);
     return sub_graph;
   }
@@ -79,45 +83,29 @@ public:
     nodes_.push_back(node);
   }
 
-  std::string convert_graph() const
-  {
-    //TODO
-
-    std::vector<std::pair<std::size_t,std::size_t> > edges;
-
-    // for(const auto a )
-
-    const auto edges(sub_graph.get_edges());
-
-    std::string out;
-    for(const auto& edge : edges)
-      out += ;
-    
-    return out;
-  }
-
 private:
 
-  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, graph& sub_graph)
+  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph)
   {
-    sub_graph.insert_node(nodes_[index]);
+    sub_graph += ' ' + nodes_[index].name_;
     used_indices.insert(index);
     if(depth > 0)
       for(const auto a : nodes_[index].neighbours_)
-        if(find(used_indices,a) != used_indices.end())
-          query_graph(a,depth-1);
+        if(used_indices.find(a) != used_indices.end())
+          build_sub_graph(a,depth-1,used_indices,sub_graph);
   }
 
   std::size_t find_node(const std::string& query)
   {
+    const auto it(std::lower_bound(nodes_.begin(),nodes_.end(),query));
     try{
-      const auto it(std::lower_bound(nodes_.begin(),nodes_.end(),query));
-      if(it == nodes_.end()) throw not_found;
-      return std::distance(nodes_.begin(),it);
+      if(it == nodes_.end())
+        throw not_found;
     }
     catch(std::exception& e){
       std::cout << e.what() << '\n';
     }
+    return std::distance(nodes_.begin(),it);
   }
 
   //*******
@@ -125,27 +113,5 @@ private:
   std::vector<node_type> nodes_;
 };
 
-/*
-  binning. nodes are neighbours if values are in the same bin
-  const std::size_t num_bins(100);
-  std::vector<std::vector<double> > values;
-*/
 
-std::string get_query()
-{
-  std::string query(/*fetch query from web interface*/);
-  return query;
-}
-
-int main()
-{
-  const std::size_t depth(3);
-  const std::string graph_file("graph.dat");
-  const graph G(graph_file);
-  const std::string query(get_query());
-  const graph sub_graph(G.query_graph(query,depth));
-
-  const std::string sub_graph_str(sub_graph.convert_graph());
-
-  return 0;
-}
+#endif
