@@ -13,7 +13,7 @@ class not_in_database: public std::exception
   }
 } not_found;
 
-class node
+struct node
 {
 
 public:
@@ -23,11 +23,7 @@ public:
     , properties_(properties)
   {}
 
-private:
-
-  bool operator<(const node& in) const {return ((this->name).compare(in.name) < 0);}
-
-  //*******
+  bool operator<(const node& in) const {return ((this->name_).compare(in.name_) < 0);}
 
   std::vector<double> properties_;
   std::string name_;
@@ -65,7 +61,7 @@ private:
     sub_graph.push_back(nodes_[index]);
     used_indices.insert(index);
     if(depth > 0)
-      for(const auto a : nodes_[index].neighbours)
+      for(const auto a : nodes_[index].neighbours_)
         if(find(used_indices,a) != used_indices.end())
           query_graph(a,depth-1);
   }
@@ -95,21 +91,16 @@ private:
 
 std::string get_query()
 {
-  //TODO: fetch query from web interface
-  std::string query;
+  std::string query(/*fetch query from web interface*/);
   return query;
 }
 
 int main()
 {
   const std::size_t depth(3);
-
   const std::string graph_file("graph.dat");
-
   const graph G(graph_file);
-
   const std::string query(get_query());
-
   const graph sub_graph(G.query_graph(query,depth));
 
   return 0;
