@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <exception>
+#include <set>
 
 #include "parse.hpp"
 
@@ -45,9 +46,9 @@ public:
     EdgeFile ef(graph_file);
 
     std::vector<std::pair<std::string,std::string> > edges;
-    ef.load([this] (const std::string & s, const std::string &, const std::string &v) {
-      this->nodes_.push_back(node(s, std::vector<double>()));
-      this->nodes_.push_back(node(v, std::vector<double>()));
+    ef.load([this, &edges] (const std::string & s, const std::string &, const std::string &v) {
+      this->nodes_.push_back(node_type(s), std::vector<double>());
+      this->nodes_.push_back(node_type(v), std::vector<double>());
       edges.push_back(std::make_pair(s,v));
       return true;
     });
@@ -59,7 +60,7 @@ public:
     for(const auto& edge : edges){
       const std::size_t ind0(find_node(edge.first));
       const std::size_t ind1(find_node(edge.second));
-      nodes_[ind0].neighbours.push_back(ind1);
+      nodes_[ind0].neighbours_.push_back(ind1);
     }
   }  
 
