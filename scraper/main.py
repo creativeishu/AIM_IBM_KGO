@@ -8,6 +8,7 @@ import json
 from json import JSONDecoder
 from datetime import datetime, timedelta
 import wikipedia as wp
+from serialization_helpers import *
 
 
 def main(args):
@@ -15,24 +16,23 @@ def main(args):
     print "#getting periodic table"
     
     #output_to_file("test.txt",[["s","p","o"], ["x","y","z"]])
-
+    edge_file_name = "edges.txt"
 
     #first get the periodic table of elements
     periodic_table =  get_pages_in_category("Chemical elements")
 
-    excluded=False 
-    for el in periodic_table[:15] :
-        element_page = wp.page(el)
-        this_elements_categories = element_page.categories
-        print el, ": ",
-        for cat in this_elements_categories:
-            for excl in exclusionlist:
-                if excl in cat: 
-                    excluded=True
-            if not (excluded):
-                print cat,",",
-            excluded=False
-        print ""
+    with EdgeFile(edge_file_name, True) as ef:
+        excluded=False 
+        for el in periodic_table[5:30] :
+            element_page = wp.page(el)
+            this_elements_categories = element_page.categories
+            for cat in this_elements_categories:
+                for excl in exclusionlist:
+                    if excl in cat: 
+                        excluded=True
+                if not (excluded):
+                    ef.add_entry(el,"is member of", cat)
+                excluded=False
         #now our node-edge-node is
         # element   memberof  this_elements_categories[i]
 
