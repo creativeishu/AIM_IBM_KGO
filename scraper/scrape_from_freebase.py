@@ -8,42 +8,44 @@ from serialization_helpers import *
 
 def main(args):
 
-    stopping_count = 19000
+    stopping_count = 400
+    runtime = 0
 
 
     pf=PropertiesFile("props.txt", True)
     ef=EdgeFile("edges.txt", True)
 
     cursor = ""
-    #while(cursor<stopping_count):
-    cursor, data = get_result_bunch(cursor)
-    for x in data[0].keys():
-        print data[0][x]
-#    print data[0].keys()
-    data_to_files(data,pf,ef)
+    while(runtime<stopping_count):
+        #get all the id's
+        cursor, data = get_result_bunch(cursor)
+        topic_ids = [x['id'][0] for x in data]
+
+        print "getting data for topics", runtime
+        data_per_topic = get_topic_for_id(topic_ids)
+        if data_per_topic is not None:
+            data_to_files(data_per_topic,pf,ef)
+        runtime +=1
 
 
 
 def get_result_bunch(cursor):
     """execute a query with the specified cursor [=kindof offset in the database]"""
 
-    print "   #getting bunch of results {0:8s}".format(cursor)
     service_url = 'https://www.googleapis.com/freebase/v1/mqlread'
     query = [{
-       #"type": {'key': {"namespace": "/chemistry",'limit':'1'},'limit':'1'},
-       #"output" : "(all:/measurement)",
-       # "limit" : "8",
-       # "id": None,
+        "id": [],
+        "mid": [],
        #"name": "Malaria",
-         "*": [{}],
+       #  "*": [{}],
+         #"topic": [{}],
+         #"/common/topic/notable_for": [{}],
          "type": {
-           "key": {
-           "namespace": "/chemistry",
-           "limit": 1
-           },
+           "key": { "namespace": "/chemistry", "limit": 1 },
+           "*":[],
          "limit": 1
          },
-         "limit": 3
+         "limit": 100 
         }]
 
     params = {
@@ -52,13 +54,16 @@ def get_result_bunch(cursor):
         "cursor" : str(cursor),
         "limit": "10"
         }
-    print "#", params 
+    #print "#", params 
     url = service_url + '?' + urllib.urlencode(params)
-    print "#", url
+    #print "#", url
     response = json.loads(urllib.urlopen(url).read())
-    assert ('result' in response)
-    #if ('result' in response):
-    return  response['cursor'],response['result']
+    #assert ('result' in response)
+    if ('result' in response):
+        return  response['cursor'],response['result']
+    else:
+        print response
+        quit()
    #elif 'error' in response:
    #    print response['error']['message']
    #    return  cursor,[]
@@ -70,20 +75,45 @@ def data_to_files(data, pf, ef):
     key_exclusion_list = [
             "url./common/topic/topic_equivalent_webpage" ,   #just crap translations of the webpage
                         ]
-    print len(data)
     for p in data:
-        nodeprops={}
+        if 'name' in p:
+            nodeprops={'name':p['name']}
+        else:
+            nodeprops={}
         if 'output' in p and 'all' in p['output']:
             for k,v in p['output']['all'].items():
                 if k in key_exclusion_list: continue  #skip excluded keys
                 for vi in v:
                     if type(vi) == dict and 'mid' in vi:
                         ef.add_entry(p['mid'],k,vi['mid'])
-                        #print p['mid'], '<%s>'%k, vi['mid'] # links
+                   #elif type(vi) == list:
+                   #    for sublist in vi:
+                   #        if type(sublist) == dict and 'mid' in vi:
+                   #            ef.add_entry(p['mid'],k,vi['mid'])
                     else:
-                        #print p['mid'], '<%s>'%k, vi # node properties
- #                      print k
                         nodeprops[k] = vi
         pf.add_entry(p['mid'],nodeprops)
 
+def get_topic_for_id(concept_id):
+    """execute a query with the specified cursor [=kindof offset in the database]"""
+
+    service_url = 'https://www.googleapis.com/freebase/v1/search'
+    params = {
+        #"id": concept_id,
+        "filter" : "(any " + " ".join(["id:" + x for x in concept_id]) + ")",
+        "output": "(all)",
+        "key" : "AIzaSyCgJBUnif7NrPqwY_loGQXo9OGaPPHTjA0",
+        "limit" : 100,
+     }
+    url = service_url + '?' + urllib.urlencode(params)
+    response = json.loads(urllib.urlopen(url).read())
+
+    if ('result' in response):
+        return  response['result']
+    elif 'error' in response:
+        print response['error']['message']
+        return  None
+    else:
+        print response
+        quit()
 main(sys.argv[1:])

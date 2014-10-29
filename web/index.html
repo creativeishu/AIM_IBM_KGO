@@ -2,7 +2,7 @@
 
 <head>
     <link href="libs/vis/vis.css" rel="stylesheet" type="text/css" />
-    <script src="libs/vis/vis.min.js"></script>
+    <script src="libs/vis/vis.js"></script>
     <script src="libs/jquery-1.11.1.min.js"></script>
     
     <script>
@@ -10,6 +10,17 @@
         var container = document.getElementById('mygraph');
         var network = new vis.Network(container,{},{ physics: {barnesHut: {springLength:75, springConstant:0.015}}
                                                     });
+          network.on('select', function(properties) {
+            var selected_node = properties["nodes"][0];
+            $.ajax({type: "GET", url: 'http://127.0.0.1/cgi-bin/interface.py', data: {'node': selected_node}}).done(function(data) {
+              network.setOptions({
+                                    stabilize: false
+                                 });
+              network.setData({
+                                dot: data
+                              });
+            });
+                        });
         
         $( "#search-form" ).submit(function( event ) {
             
@@ -26,6 +37,12 @@
           event.preventDefault();
         });
         
+        $(".example_search a").click(function() {
+            var val = $(this).html();
+            $("#node-search-field").val(val);
+            $("#search-form").submit();
+            return false;
+        });
         
     });
     </script>
@@ -38,7 +55,10 @@
     <p>
         <input id="node-search-field" name="node" type="text" />
         <input type="submit" value="load!" />
-    </p>
+    <span>Example:</span>
+    <span class="example_search"><a href=#>_m_04t7l</a></span>
+    <span class="example_search"><a href=#>_m_025rsfk</a></span>
+</p>
     </form>
     
     <div id="mygraph"></div>

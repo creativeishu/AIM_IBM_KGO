@@ -3,59 +3,77 @@
 
 #include <string>
 #include <array>
-#include <fstream>
 #include <functional>
-
-#include "thirdparty/rapidjson/filereadstream.h"
-#include "thirdparty/rapidjson/document.h"
+#include <unordered_map>
 
 const size_t MAX_READ_BUFFER = 65536;
 
+// Forward declaration for foreign namespace
+namespace rapidjson {
+    class FileReadStream;
+}
+
+/**
+ * Load an edges JSON file
+ */
 class EdgeFile
 {
 public:
-    EdgeFile(const std::string & filename) :
-        fh_(nullptr),
-        is_(nullptr)
-    {
-        fh_ = fopen(filename.c_str(), "r");
-        is_ = new rapidjson::FileReadStream(fh_, &readBuffer_.front(), readBuffer_.size());
-    }
+  EdgeFile(const std::string & filename);
+  ~EdgeFile();
 
-    void load(std::function<bool (const std::string &, const std::string &, const std::string &)> f)
-    {
-        rapidjson::Document d;
+  /**
+   * Parse the file opened during construction
+   * \param f The function to call for every found (subject,predicate,value) triple,
+   *          can return false to terminate parsing, true to continue.
+   */
+  void load(std::function<bool (const std::string &, const std::string &, const std::string &)> f);
 
-        if (d.ParseStream(*is_).HasParseError())
-            return;
-        
-        assert(d.IsArray() && "Root element is not an array");
+  /**
+   * Delete copy constructor due to file handles present
+   */
+  EdgeFile(const EdgeFile &) = delete;
 
-        for (auto i = d.Begin(); i != d.End(); ++i)
-        {
-            assert(i->IsArray() && "Subelement is not an array");
-            if (! f((*i)[0].GetString(), (*i)[1].GetString(), (*i)[2].GetString()) )
-                return;
-        }
-    }
-
-    ~EdgeFile()
-    {
-        if (fh_)
-            fclose(fh_);
-        if (is_)
-            delete is_;
-    }
-
-    // we have state which whould require deep copy/movement
-    EdgeFile(const EdgeFile &) = delete;
-    EdgeFile& operator=(const EdgeFile &) = delete;
+  /**
+   * Delete assignment constructor due to file handles present
+   */
+  EdgeFile& operator=(const EdgeFile &) = delete;
 
 private:
-    std::array<char, MAX_READ_BUFFER> readBuffer_;
-    FILE * fh_;
-    rapidjson::FileReadStream * is_;
-    
+  std::array<char, MAX_READ_BUFFER> readBuffer_;
+  FILE * fh_;
+  rapidjson::FileReadStream * is_;
+};
+
+class PropertiesFile
+{
+public:
+  typedef std::unordered_map<std::string, std::string> PropertyContainer;
+
+  PropertiesFile(const std::string & filename);
+  ~PropertiesFile();
+
+  /**
+   * Parse the file opened during construction
+   * \param f The function to call for every found node entry containing a properties object,
+   *          can return false to terminate parsing, true to continue.
+   */
+  void load(std::function<bool (const std::string &, PropertyContainer &&)> f);
+
+  /**
+   * Delete copy constructor due to file handles present
+   */
+  PropertiesFile(const PropertiesFile &) = delete;
+
+  /**
+   * Delete assignment constructor due to file handles present
+   */
+  PropertiesFile& operator=(const PropertiesFile &) = delete;
+
+private:
+  std::array<char, MAX_READ_BUFFER> readBuffer_;
+  FILE * fh_;
+  rapidjson::FileReadStream * is_;
 };
 
 #endif
