@@ -1,5 +1,8 @@
 #include "graph.hpp"
 
+#include <iostream>
+#include <tuple>
+
 graph::graph(const std::string& graph_file, const std::string& properties_file)
 {
   EdgeFile ef(graph_file);

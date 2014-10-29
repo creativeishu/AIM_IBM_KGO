@@ -1,17 +1,15 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
+#include "parse.hpp"
+#include "utility.hpp"
+
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <cassert>
 #include <set>
-#include <iostream>
-#include <tuple>
 #include <unordered_map>
-
-#include "parse.hpp"
-#include "utility.hpp"
 
 struct node_type
 {
@@ -56,6 +54,5 @@ private:
 
   std::vector<node_type> nodes_;
 };
-
 
 #endif
