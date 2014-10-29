@@ -91,26 +91,59 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
 
 void graph::build_sub_graph(const std::vector<std::size_t>& indices0, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
 {
-  for(const auto ind0 : indices0)
-    sub_graph += nodes_[ind0].id_ + " [label=\"" + nodes_[ind0].name_ + "\"];\n";
-
-  if(depth > 0){
-
-    std::vector<std::size_t> indices1;
-    for(const auto ind0 : indices0)
-      for(const auto b : nodes_[ind0].neighbours_){
-        const std::size_t ind1(b.first);
-        if(used_indices.find(ind1) == used_indices.end()){
-          const std::string label(b.second);
-          used_indices.insert(ind1);
-          sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
-          indices1.push_back(ind1);
-        }
-      }
-
-    build_sub_graph(indices1,depth-1,used_indices,sub_graph);
-  }
+    for(const auto ind0 : indices0) {
+        sub_graph += nodes_[ind0].id_;
+        sub_graph += " [";
+        sub_graph += "label=\"" + nodes_[ind0].name_ + "\"";
         
+        std::string title_str = "";
+        node_type::PropertyContainer::const_iterator match;
+        
+        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/melting_point");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Melting T : " + match->second + " °C<br />";
+        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/boiling_point");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Boiling T : " + match->second + " °C<br />";
+        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/melting_point");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Melting T : " + match->second + " °C<br />";
+        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/boiling_point");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Boiling T : " + match->second + " °C<br />";
+        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/atomic_mass");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Mass : " + match->second + "u<br />";
+        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/atomic_mass");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Mass : " + match->second + "u<br />";
+        match = nodes_[ind0].properties_.find("measurement./chemistry/isotope/mass");
+        if (match != nodes_[ind0].properties_.end())
+            title_str += "Mass : " + match->second + "u<br />";
+        
+        
+        if (!title_str.empty())
+          sub_graph += " title=\""+ title_str + "\"";
+        
+        sub_graph += "];\n";
+    }
+    if(depth > 0){
+        
+        std::vector<std::size_t> indices1;
+        for(const auto ind0 : indices0)
+            for(const auto b : nodes_[ind0].neighbours_){
+                const std::size_t ind1(b.first);
+                if(used_indices.find(ind1) == used_indices.end()){
+                    const std::string label(b.second);
+                    used_indices.insert(ind1);
+                    sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
+                    indices1.push_back(ind1);
+                }
+            }
+        
+        build_sub_graph(indices1,depth-1,used_indices,sub_graph);
+    }
+    
 }
 
 std::size_t graph::find_node(const std::string& query) const
