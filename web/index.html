@@ -37,6 +37,12 @@
           event.preventDefault();
         });
         
+        $(".example_search a").click(function() {
+            var val = $(this).html();
+            $("#node-search-field").val(val);
+            $("#search-form").submit();
+            return false;
+        });
         
     });
     </script>
@@ -49,7 +55,10 @@
     <p>
         <input id="node-search-field" name="node" type="text" />
         <input type="submit" value="load!" />
-    </p>
+    <span>Example:</span>
+    <span class="example_search"><a href=#>_m_04t7l</a></span>
+    <span class="example_search"><a href=#>_m_025rsfk</a></span>
+</p>
     </form>
     
     <div id="mygraph"></div>
