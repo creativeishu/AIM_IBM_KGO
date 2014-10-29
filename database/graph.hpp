@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "parse.hpp"
+#include "utility.hpp"
 
 class not_in_database: public std::exception
 {
@@ -33,8 +34,8 @@ public:
   bool operator<(const std::string& in) const {return ((this->name_).compare(in) < 0);}
   bool operator==(const node_type& in) const {return this->name_ == in.name_;}
 
-  std::vector<double> properties_;
   std::string name_;
+  std::vector<double> properties_;
   std::vector<unsigned> neighbours_;
 };
 
@@ -66,6 +67,12 @@ public:
       const std::size_t ind1(find_node(edge.second));
       nodes_[ind0].neighbours_.push_back(ind1);
     }
+
+    for(const auto& node : nodes_)
+      std::cout << node.name_ << " | " << node.neighbours_ << std::endl;
+
+    exit(0);
+
   }  
 
   std::string query_graph(const std::string& query, const std::size_t depth) const
