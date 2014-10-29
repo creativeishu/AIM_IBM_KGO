@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
         std::cout << "Received " << query << std::endl;
 
         // Reply to query
-        const std::string res = G.query_graph(query,depth);
+        const bool by_name(false);
+        const std::string res = G.query_graph(query,depth,by_name);
         std::ofstream ofs(pipe_path);
         ofs << res;
         ofs.close();

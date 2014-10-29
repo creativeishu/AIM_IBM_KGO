@@ -50,22 +50,20 @@ public:
    * \param query Currently the exact name of a node
    * \param depth The depth of the search
    */
-  std::string query_graph(const std::string& query, const std::size_t depth) const;
-
-  /**
-   * Insert a new node
-   */
-  void insert_node(const node_type&);
+  std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
 private:
 
   void build_sub_graph(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
 
   std::size_t find_node(const std::string&) const;
+  std::size_t find_node_id(const std::string&) const;
+  std::size_t find_node_name(const std::string&) const;
 
   //*******
 
   std::vector<node_type> nodes_;
+  std::unordered_map<std::string, std::size_t> lookup_id_, lookup_name_;
 };
 
 #endif
