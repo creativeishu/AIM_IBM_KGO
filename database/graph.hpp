@@ -38,8 +38,23 @@ class graph
 
 public:
 
-  graph(const std::string&, const std::string&);
-  std::string query_graph(const std::string&, const std::size_t) const;
+  /**
+   * Construct the graph out of the two main JSON files containing the data
+   * \param graph_file Path to a JSON file containing (subject,predicate,value) triples
+   * \param properties_file Path to a JSON file containing a properties object for each subject/node
+   */
+  graph(const std::string& graph_file, const std::string& properties_file);
+
+  /**
+   * Query the graph
+   * \param query Currently the exact name of a node
+   * \param depth The depth of the search
+   */
+  std::string query_graph(const std::string& query, const std::size_t depth) const;
+
+  /**
+   * Insert a new node
+   */
   void insert_node(const node_type&);
 
 private:
