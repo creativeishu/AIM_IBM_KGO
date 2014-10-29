@@ -9,6 +9,7 @@
 #include <set>
 #include <iostream>
 #include <tuple>
+#include <unordered_map>
 
 #include "parse.hpp"
 #include "utility.hpp"
@@ -23,10 +24,9 @@ class not_in_database: public std::exception
 
 struct node_type
 {
+  typedef std::unordered_map<std::string, std::string> PropertyContainer;
 
-public:
-
-  node_type(const std::string& name, const std::vector<double>& properties)
+  node_type(const std::string& name, const PropertyContainer& properties = PropertyContainer())
     : name_(name)
     , properties_(properties)
   {}
@@ -36,7 +36,7 @@ public:
   bool operator==(const node_type& in) const {return this->name_ == in.name_;}
 
   std::string name_;
-  std::vector<double> properties_;
+  PropertyContainer properties_;
   std::vector<std::pair<std::size_t,std::string> > neighbours_;
 };
 
@@ -53,8 +53,8 @@ public:
 
     std::vector<std::tuple<std::string,std::string,std::string> > edges;
     ef.load([this, &edges] (const std::string & s, const std::string & p, const std::string &v) {
-        this->nodes_.push_back(node_type(s, std::vector<double>()));
-        this->nodes_.push_back(node_type(v, std::vector<double>()));
+        this->nodes_.push_back(node_type(s));
+        this->nodes_.push_back(node_type(v));
         edges.push_back(std::make_tuple(s,p,v));
         return true;
       });
