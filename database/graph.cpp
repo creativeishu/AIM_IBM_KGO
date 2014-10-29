@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <regex>
 
 graph::graph(const std::string& graph_file, const std::string& properties_file)
 {
@@ -25,12 +26,14 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
   PropertiesFile pf(properties_file);
   pf.load([this](const std::string & s, PropertiesFile::PropertyContainer && props){
       const std::size_t ind(find_node_id(s));
-      const std::string name(props["name./common/topic/alias"]);
 
-      if(name != ""){
-        nodes_[ind].name_ = name;
-        lookup_name_.insert(std::make_pair(name,ind));
-      }
+      for(const auto a : props)
+        if(std::regex_match (a.first, std::regex("(name)(.*)"))){
+          const std::string name(a.second);
+          nodes_[ind].name_ = name;
+          lookup_name_.insert(std::make_pair(name,ind));          
+          break;
+        }
 
       nodes_[ind].properties_ = props;
       return true;
@@ -42,7 +45,28 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
     nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
   }
 
-  std::cout << nodes_.size() << ' ' << edges.size() << std::endl; exit(0);
+  // for(const auto& node : nodes_){
+  //   for(const auto a : node.properties_)
+  //     std::cout << a << std::endl;
+  //   std::cout << "***********" << std::endl;
+  //   std::cin.get();
+  // }
+
+  // exit(0);
+
+  //TODO: additional edges based on similatiry of properties
+
+  // std::cout << nodes_.size() << ' ' << edges.size() << std::endl; exit(0);
+
+  // std::vector<std::size_t> dist(nodes_.size(),0);
+  // for(const auto a : nodes_)
+  //   ++dist[a.neighbours_.size()];
+
+  // for(unsigned i = 0; i < dist.size(); ++i)
+  //   if(dist[i] > 0)
+  //     std::cout << i << ' ' << dist[i] << std::endl;
+
+  // exit(0);
 
   // for(const auto& node : nodes_)
   //   std::cout << node.id_ << " | " << node.name_ << std::endl;
@@ -67,14 +91,6 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
 
 void graph::build_sub_graph(const std::vector<std::size_t>& indices0, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
 {
-  //TODO: limit maximum number of nodes in sub-graph
-  //TODO: display other properties
-  //TODO: search by name
-  //TODO: binning on properties
-  //TODO: search with additional criteria
-  //TODO: fuzzy search
-  //TODO: export properties to dot output (display in gui)
-
   for(const auto ind0 : indices0)
     sub_graph += nodes_[ind0].id_ + " [label=\"" + nodes_[ind0].name_ + "\"];\n";
 
