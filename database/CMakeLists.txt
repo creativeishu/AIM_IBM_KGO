@@ -30,9 +30,11 @@ add_executable(parse_TEST
 add_executable(daemon
     daemon.cpp
     parse.cpp
+    graph.cpp       
     )
 
 add_executable(graph_test
     graph_test.cpp
     parse.cpp
+    graph.cpp       
     )

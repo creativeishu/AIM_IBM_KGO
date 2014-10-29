@@ -5,7 +5,6 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
-#include <exception>
 #include <set>
 #include <iostream>
 #include <tuple>
@@ -14,29 +13,23 @@
 #include "parse.hpp"
 #include "utility.hpp"
 
-class not_in_database: public std::exception
-{
-  virtual const char* what() const throw()
-  {
-    return "Item not in database";
-  }
-} not_found;
-
 struct node_type
 {
   typedef std::unordered_map<std::string, std::string> PropertyContainer;
 
-  node_type(const std::string& name, const PropertyContainer& properties = PropertyContainer())
-    : name_(name)
-    , properties_(properties)
+  node_type(const std::string& id)
+    : id_(id)
+    , properties_(PropertyContainer())
+    , name_("nolabel")
   {}
 
-  bool operator<(const node_type& in) const {return ((this->name_).compare(in.name_) < 0);}
-  bool operator<(const std::string& in) const {return ((this->name_).compare(in) < 0);}
-  bool operator==(const node_type& in) const {return this->name_ == in.name_;}
+  bool operator<(const node_type& in) const {return ((this->id_).compare(in.id_) < 0);}
+  bool operator<(const std::string& in) const {return ((this->id_).compare(in) < 0);}
+  bool operator==(const node_type& in) const {return this->id_ == in.id_;}
 
-  std::string name_;
+  std::string id_;
   PropertyContainer properties_;
+  std::string name_;
   std::vector<std::pair<std::size_t,std::string> > neighbours_;
 };
 
@@ -45,97 +38,17 @@ class graph
 
 public:
 
-  graph() {};
-
-  graph(const std::string& graph_file, const std::string& properties_file)
-  {
-    EdgeFile ef(graph_file);
-
-    std::vector<std::tuple<std::string,std::string,std::string> > edges;
-    ef.load([this, &edges] (const std::string & s, const std::string & p, const std::string &v) {
-        this->nodes_.push_back(node_type(s));
-        this->nodes_.push_back(node_type(v));
-        edges.push_back(std::make_tuple(s,p,v));
-        return true;
-      });
-
-    std::set<node_type> nodes_set(nodes_.begin(),nodes_.end());
-    nodes_.assign(nodes_set.begin(),nodes_set.end());
-    std::sort(nodes_.begin(),nodes_.end());
-
-    PropertiesFile pf(properties_file);
-    pf.load([this](const std::string & s, PropertiesFile::PropertyContainer && props){
-        nodes_[find_node(s)].properties_ = props;
-        return true;
-    });
-
-    for(const auto& edge : edges){
-      const std::size_t ind0(find_node(std::get<0>(edge)));
-      const std::size_t ind1(find_node(std::get<2>(edge)));
-      nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
-    }
-
-    // for(const auto& node : nodes_)
-    //   std::cout << node.name_ << " | " << node.neighbours_ << std::endl;
-
-    // exit(0);
-
-  }  
-
-  std::string query_graph(const std::string& query, const std::size_t depth) const
-  {
-    const std::size_t index(find_node(query));
-
-    std::set<std::size_t> used_indices;
-    std::string sub_graph = "graph G {\n";
-    if( index == nodes_.size() )
-        sub_graph += "nf [label=\"NOT FOUND\"];\n";
-    else
-        build_sub_graph(index,depth,used_indices,sub_graph);
-
-    sub_graph += "}";
-    return sub_graph;
-  }
-
-  void insert_node(const node_type& node)
-  {
-    nodes_.push_back(node);
-  }
+  graph(const std::string&, const std::string&);
+  std::string query_graph(const std::string&, const std::size_t) const;
+  void insert_node(const node_type&);
 
 private:
 
-  void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
-  {
-    // std::cout << nodes_[index].neighbours_ << std::endl;
-    // std::cout << depth << std::endl;
+  void build_sub_graph_dfs(const std::size_t, const std::size_t, std::set<std::size_t>&, std::string&) const;
 
-    sub_graph += nodes_[index].name_ + ";\n";
+  void build_sub_graph_bfs(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
 
-    used_indices.insert(index);
-    if(depth > 0)
-      for(const auto a : nodes_[index].neighbours_){
-        const std::size_t ind(a.first);
-        const std::string label(a.second);
-        if(used_indices.find(ind) == used_indices.end()){
-
-          sub_graph += nodes_[index].name_ + " -- " + nodes_[ind].name_ + " [label=\"" + label + "\"]" + ";\n";
-          build_sub_graph(ind,depth-1,used_indices,sub_graph);
-        }
-      }
-  }
-
-  std::size_t find_node(const std::string& query) const
-  {
-    const auto it(std::lower_bound(nodes_.begin(),nodes_.end(),query));
-    try{
-      if(it == nodes_.end())
-        throw not_found;
-    }
-    catch(std::exception& e){
-      std::cout << e.what() << '\n';
-    }
-    return std::distance(nodes_.begin(),it);
-  }
+  std::size_t find_node(const std::string&) const;
 
   //*******
 
