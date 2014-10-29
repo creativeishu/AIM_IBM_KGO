@@ -17,16 +17,18 @@ print 'Content-type: text/html\r\n\n'
 # Open the pipe and write what we get from the HTTP-GET request
 
 def process_query():
-    val = "ERROR: web form <node> not sent."
+    val = str(form)
+# "ERROR: web form <node> not sent."
     try:
         val = form["node"].value
+        val = re.sub(r'_','/',val)
     except:
         print "graph g { n [label=\"" + val +"\"]; }"
         return
         
      
 # FOR DEBUGGING:
-#print "graph g { n [label=\"" + val +"\"]; }"
+#    print "graph g { n [label=\"" + val +"\"]; }"
     f = open(pipe_path, 'w')
     f.write(val)
     f.close()
