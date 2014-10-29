@@ -24,7 +24,8 @@ public:
 
   /**
    * Parse the file opened during construction
-   * \param f The function to call for every found (subject,predicate,value) triple
+   * \param f The function to call for every found (subject,predicate,value) triple,
+   *          can return false to terminate parsing, true to continue.
    */
   void load(std::function<bool (const std::string &, const std::string &, const std::string &)> f);
 
@@ -54,7 +55,8 @@ public:
 
   /**
    * Parse the file opened during construction
-   * \param f The function to call for every found node entry containing a properties object
+   * \param f The function to call for every found node entry containing a properties object,
+   *          can return false to terminate parsing, true to continue.
    */
   void load(std::function<bool (const std::string &, PropertyContainer &&)> f);
 
