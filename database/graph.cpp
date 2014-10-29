@@ -121,10 +121,16 @@ std::size_t graph::find_node(const std::string& query) const
 
 std::size_t graph::find_node_id(const std::string& query) const
 {
-  return lookup_id_.at(query);
+  std::unordered_map<std::string, std::size_t>::const_iterator match = lookup_id_.find(query);
+  if (match == lookup_id_.end())
+    return nodes_.size();
+  return match->second;
 }
 
 std::size_t graph::find_node_name(const std::string& query) const
 {
-  return lookup_name_.at(query);
+  std::unordered_map<std::string, std::size_t>::const_iterator match = lookup_name_.find(query);
+  if (match == lookup_name_.end())
+    return nodes_.size();
+  return match->second;
 }
