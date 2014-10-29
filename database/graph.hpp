@@ -63,6 +63,11 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
+  /**
+   * Print out nodes connected to the looked-up one up to a certain depth
+   */
+  void dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const;
+
 private:
 
   void build_sub_graph(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
@@ -72,6 +77,12 @@ private:
   std::size_t find_node(const std::string&) const;
   std::size_t find_node_id(const std::string&) const;
   std::size_t find_node_name(const std::string&) const;
+
+  void visit_nodes_bfs(
+      const std::size_t root,
+      std::function<bool (const node_type &)> f,
+      const std::size_t depth = std::numeric_limits<size_t>::max()
+  ) const;
 
   //*******
 

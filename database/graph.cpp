@@ -3,6 +3,7 @@
 #include <iostream>
 #include <tuple>
 #include <regex>
+#include <stack>
 
 graph::graph(const std::string& graph_file, const std::string& properties_file)
 {
@@ -138,10 +139,12 @@ void graph::build_sub_graph(const std::vector<std::size_t>& indices0, const std:
   if(depth > 0){
         
     std::vector<std::size_t> indices1;
-    for(const auto ind0 : indices0)
-      for(const auto b : nodes_[ind0].neighbours_){
+    for (const auto ind0 : indices0)
+      for (const auto b : nodes_[ind0].neighbours_)
+      {
         const std::size_t ind1(b.first);
-        if(used_indices.find(ind1) == used_indices.end()){
+        if (used_indices.find(ind1) == used_indices.end())
+        {
           const std::string label(b.second);
           used_indices.insert(ind1);
           sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
@@ -194,6 +197,53 @@ void graph::add_similarity(const std::string property, const double threshold)
     }
 
   }
+}
+
+void graph::visit_nodes_bfs(
+  const std::size_t root,
+  std::function<bool (const node_type &)> f,
+  const std::size_t depth) const
+{
+  std::set<size_t> visited({ root });
+  std::stack<std::pair<size_t,size_t>> queue({ std::make_pair(root, 0) });
+
+  while (!queue.empty())
+  {
+    size_t t(0), d(0);
+    std::tie(t, d) = queue.top();
+    queue.pop();
+
+    // call the function on the node and terminate if it returns false
+    if (!f(nodes_[t]))
+      return;
+
+    // do not add further neighbours since we reached maximum depth already
+    if (d >= depth)
+      continue;
+
+    for (size_t n(0); n < nodes_[t].neighbours_.size(); ++n)
+    {
+      size_t n_i(nodes_[t].neighbours_[n].first);
+      if (visited.find(n_i) == visited.end())
+      {
+        visited.emplace(n_i);
+        queue.emplace(n_i, d+1);
+      }
+    }
+  }
+}
+
+void graph::dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const
+{
+  const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
+  if(index == nodes_.size())
+    return;
+
+  auto printer = [](const node_type & node) {
+    std::cout << node.id_ << " (name: " << node.name_ << ")" << std::endl;
+    return true;
+  };
+  visit_nodes_bfs(index, printer, depth);
 }
 
 std::size_t graph::find_node(const std::string& query) const
