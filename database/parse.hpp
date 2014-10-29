@@ -13,15 +13,29 @@ namespace rapidjson {
     class FileReadStream;
 }
 
+/**
+ * Load an edges JSON file
+ */
 class EdgeFile
 {
 public:
   EdgeFile(const std::string & filename);
-  void load(std::function<bool (const std::string &, const std::string &, const std::string &)> f);
   ~EdgeFile();
 
-  // we have state which whould require deep copy/movement
+  /**
+   * Parse the file opened during construction
+   * \param f The function to call for every found (subject,predicate,value) triple
+   */
+  void load(std::function<bool (const std::string &, const std::string &, const std::string &)> f);
+
+  /**
+   * Delete copy constructor due to file handles present
+   */
   EdgeFile(const EdgeFile &) = delete;
+
+  /**
+   * Delete assignment constructor due to file handles present
+   */
   EdgeFile& operator=(const EdgeFile &) = delete;
 
 private:
@@ -36,11 +50,22 @@ public:
   typedef std::unordered_map<std::string, std::string> PropertyContainer;
 
   PropertiesFile(const std::string & filename);
-  void load(std::function<bool (const std::string &, PropertyContainer &&)> f);
   ~PropertiesFile();
 
-  // we have state which whould require deep copy/movement
+  /**
+   * Parse the file opened during construction
+   * \param f The function to call for every found node entry containing a properties object
+   */
+  void load(std::function<bool (const std::string &, PropertyContainer &&)> f);
+
+  /**
+   * Delete copy constructor due to file handles present
+   */
   PropertiesFile(const PropertiesFile &) = delete;
+
+  /**
+   * Delete assignment constructor due to file handles present
+   */
   PropertiesFile& operator=(const PropertiesFile &) = delete;
 
 private:
