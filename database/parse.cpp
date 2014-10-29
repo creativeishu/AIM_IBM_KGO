@@ -80,13 +80,17 @@ void PropertiesFile::load(std::function<bool (const std::string &, PropertyConta
 
     for (auto p_i = n_i->value.MemberBegin(); p_i != n_i->value.MemberEnd(); ++p_i)
     {
-      if (!p_i->value.IsString())
+      // TODO: the idea is to store the types natively, but this either needs
+      // a "any"-type or a custom type with the visitor pattern
+
+      if (! (p_i->value.IsString() || p_i->value.IsDouble()))
         throw std::runtime_error(
             std::string("Value of property '")
             + p_i->name.GetString()
-            + "' is not a string");
+            + "' is not a string or a double");
 
-      p.insert(std::make_pair<std::string,std::string>(p_i->name.GetString(), p_i->value.GetString()));
+      std::string value(p_i->value.IsString() ? p_i->value.GetString() : std::to_string(p_i->value.GetDouble()));
+      p.insert(std::make_pair<std::string,std::string>(p_i->name.GetString(), std::move(value)));
     }
 
 
