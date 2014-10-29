@@ -12,20 +12,19 @@ def main(args):
     runtime = 0
 
 
-    pf=PropertiesFile("props.txt", True)
-    ef=EdgeFile("edges.txt", True)
+    with PropertiesFile("props.txt", True) as pf, EdgeFile("edges.txt", True) as ef:
 
-    cursor = ""
-    while(runtime<stopping_count):
-        #get all the id's
-        cursor, data = get_result_bunch(cursor)
-        topic_ids = [x['id'][0] for x in data]
+        cursor = ""
+        while(runtime<stopping_count):
+            #get all the id's
+            cursor, data = get_result_bunch(cursor)
+            topic_ids = [x['id'][0] for x in data]
 
-        print "getting data for topics", runtime
-        data_per_topic = get_topic_for_id(topic_ids)
-        if data_per_topic is not None:
-            data_to_files(data_per_topic,pf,ef)
-        runtime +=1
+            print "getting data for topics", runtime
+            data_per_topic = get_topic_for_id(topic_ids)
+            if data_per_topic is not None:
+                data_to_files(data_per_topic,pf,ef)
+            runtime +=1
 
 
 
@@ -74,6 +73,7 @@ def data_to_files(data, pf, ef):
     """take the json result and print it to the two files"""
     key_exclusion_list = [
             "url./common/topic/topic_equivalent_webpage" ,   #just crap translations of the webpage
+            "object./type/object/attribution",               #we don't care about the author
                         ]
     for p in data:
         if 'name' in p:
@@ -86,12 +86,17 @@ def data_to_files(data, pf, ef):
                 for vi in v:
                     if type(vi) == dict and 'mid' in vi:
                         ef.add_entry(p['mid'],k,vi['mid'])
-                   #elif type(vi) == list:
-                   #    for sublist in vi:
-                   #        if type(sublist) == dict and 'mid' in vi:
-                   #            ef.add_entry(p['mid'],k,vi['mid'])
                     else:
-                        nodeprops[k] = vi
+                        #if the value is a number, store it as such.
+                        try:
+                            if not "timepoint" in k:
+                                foo = float(vi)
+                            else:
+                                foo = vi
+                        except ValueError:
+                            foo = (vi)
+
+                        nodeprops[k] = foo
         pf.add_entry(p['mid'],nodeprops)
 
 def get_topic_for_id(concept_id):
