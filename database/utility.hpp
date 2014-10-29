@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 
 template <class T0, class T1>
 std::ostream& operator<<(std::ostream& os, const std::pair<T0,T1>& x)
