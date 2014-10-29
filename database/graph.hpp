@@ -73,8 +73,9 @@ public:
     const std::size_t index(find_node(query));
 
     std::set<std::size_t> used_indices;
-    std::string sub_graph;
+    std::string sub_graph = "graph G {";
     build_sub_graph(index,depth,used_indices,sub_graph);
+    sub_graph += "}";
     return sub_graph;
   }
 
@@ -87,12 +88,13 @@ private:
 
   void build_sub_graph(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
   {
-    sub_graph += ' ' + nodes_[index].name_;
     used_indices.insert(index);
     if(depth > 0)
       for(const auto a : nodes_[index].neighbours_)
-        if(used_indices.find(a) != used_indices.end())
+        if(used_indices.find(a) != used_indices.end()){
+          sub_graph += nodes_[index].name_ + " -- " + nodes_[a].name_ + " [label=contains in]" + ";\n";
           build_sub_graph(a,depth-1,used_indices,sub_graph);
+        }
   }
 
   std::size_t find_node(const std::string& query) const
