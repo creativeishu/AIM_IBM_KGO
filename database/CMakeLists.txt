@@ -24,12 +24,15 @@ set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -pg -Werror")
 
 add_executable(parse_TEST
     parse_TEST.cpp
+    parse.cpp
     )
 
 add_executable(daemon
     daemon.cpp
+    parse.cpp
     )
 
 add_executable(graph_test
     graph_test.cpp
+    parse.cpp
     )
