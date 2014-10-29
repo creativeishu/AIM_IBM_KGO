@@ -7,21 +7,25 @@
 static const char* pipe_path = "/tmp/aim2014_graph_pipe";
 
 
-int main()
+int main(int argc, char* argv[])
 {
+    if(argc != 2)
+    {
+        std::cout << "Usage: "<< argv[0] << " <graph_file>" << std::endl;
+        return -1;
+    }
     const std::size_t depth(3);
-    const std::string graph_file("graph.dat");
+    const std::string graph_file(argv[1]);
     const graph G(graph_file);
-    const std::string query("Copper");
 
     while(1)
     {
         // Get the query
-        std::string t;
+        std::string query;
         std::ifstream ifs(pipe_path);
-        ifs >> t;
+        ifs >> query;
         ifs.close();
-        std::cout << "Received " << t << std::endl;
+        std::cout << "Received " << query << std::endl;
 
         // Reply to query
         const std::string res = G.query_graph(query,depth);
