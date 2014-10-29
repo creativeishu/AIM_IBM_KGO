@@ -5,6 +5,8 @@
 #include <array>
 #include <fstream>
 #include <functional>
+#include <stdexcept>
+#include <error.h>
 
 #include "thirdparty/rapidjson/filereadstream.h"
 #include "thirdparty/rapidjson/document.h"
@@ -19,6 +21,10 @@ public:
         is_(nullptr)
     {
         fh_ = fopen(filename.c_str(), "r");
+
+        if (!fh_)
+            throw std::runtime_error(std::string("Could not open file: ") + strerror(errno));
+
         is_ = new rapidjson::FileReadStream(fh_, &readBuffer_.front(), readBuffer_.size());
     }
 
@@ -29,11 +35,14 @@ public:
         if (d.ParseStream(*is_).HasParseError())
             return;
         
-        assert(d.IsArray() && "Root element is not an array");
+        if (!d.IsArray())
+            throw std::runtime_error("Root element is not an array");
 
         for (auto i = d.Begin(); i != d.End(); ++i)
         {
-            assert(i->IsArray() && "Subelement is not an array");
+            if (!i->IsArray())
+                throw std::runtime_error("Subelement is not an array");
+
             if (! f((*i)[0].GetString(), (*i)[1].GetString(), (*i)[2].GetString()) )
                 return;
         }
