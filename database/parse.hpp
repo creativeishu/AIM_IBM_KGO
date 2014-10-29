@@ -7,7 +7,6 @@
 #include <functional>
 #include <unordered_map>
 #include <stdexcept>
-#include <error.h>
 
 #include "thirdparty/rapidjson/filereadstream.h"
 #include "thirdparty/rapidjson/document.h"
@@ -24,7 +23,7 @@ public:
         fh_ = fopen(filename.c_str(), "r");
 
         if (!fh_)
-            throw std::runtime_error(std::string("Could not open file: ") + strerror(errno));
+            throw std::runtime_error(std::string("Could not open file: ") + filename);
 
         is_ = new rapidjson::FileReadStream(fh_, &readBuffer_.front(), readBuffer_.size());
     }
@@ -80,7 +79,7 @@ public:
         fh_ = fopen(filename.c_str(), "r");
 
         if (!fh_)
-            throw std::runtime_error(std::string("Could not open file: ") + strerror(errno));
+            throw std::runtime_error(std::string("Could not open file: ") + filename);
 
         is_ = new rapidjson::FileReadStream(fh_, &readBuffer_.front(), readBuffer_.size());
     }
