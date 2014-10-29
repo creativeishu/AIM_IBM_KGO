@@ -88,7 +88,10 @@ public:
 
     std::set<std::size_t> used_indices;
     std::string sub_graph = "graph G {\n";
-    build_sub_graph(index,depth,used_indices,sub_graph);
+    if( index < nodes_.size() )
+    {
+        build_sub_graph(index,depth,used_indices,sub_graph);
+    }
     sub_graph += "}";
     return sub_graph;
   }
