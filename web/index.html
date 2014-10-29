@@ -10,17 +10,12 @@
         var container = document.getElementById('mygraph');
         var network = new vis.Network(container,{},{ physics: {barnesHut: {springLength:75, springConstant:0.015}}
                                                     });
-          network.on('select', function(properties) {
+
+          network.on('doubleClick', function(properties) {
             var selected_node = properties["nodes"][0];
-            $.ajax({type: "GET", url: 'http://127.0.0.1/cgi-bin/interface.py', data: {'node': selected_node}}).done(function(data) {
-              network.setOptions({
-                                    stabilize: false
-                                 });
-              network.setData({
-                                dot: data
-                              });
-            });
-                        });
+            $("#node-search-field").val("id:"+selected_node);
+            $("#search-form").submit();
+          });
         
         $( "#search-form" ).submit(function( event ) {
             
@@ -56,8 +51,10 @@
         <input id="node-search-field" name="node" type="text" />
         <input type="submit" value="load!" />
     <span>Example:</span>
-    <span class="example_search"><a href=#>_m_04t7l</a></span>
-    <span class="example_search"><a href=#>_m_025rsfk</a></span>
+    <span class="example_search"><a href=#>Metal</a></span>
+    <span class="example_search"><a href=#>Iron</a></span>
+    <!-- <span class="example_search"><a href=#>_m_04t7l</a></span>
+    <span class="example_search"><a href=#>_m_025rsfk</a></span> -->
 </p>
     </form>
     

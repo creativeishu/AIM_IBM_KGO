@@ -22,14 +22,16 @@ int main(int argc, char* argv[])
     while(1)
     {
         // Get the query
+        bool by_name;
         std::string query;
         std::ifstream ifs(pipe_path);
-        ifs >> query;
+        ifs >> by_name >> query;
         ifs.close();
+        std::cout << "By name  " << by_name << std::endl;
         std::cout << "Received " << query << std::endl;
 
         // Reply to query
-        const bool by_name(false);
+        // const bool by_name(false);
         const std::string res = G.query_graph(query,depth,by_name);
         std::ofstream ofs(pipe_path);
         ofs << res;
