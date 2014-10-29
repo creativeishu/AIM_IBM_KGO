@@ -47,7 +47,7 @@ public:
 
   graph() {};
 
-  graph(const std::string& graph_file)
+  graph(const std::string& graph_file, const std::string& properties_file)
   {
     EdgeFile ef(graph_file);
 
@@ -62,6 +62,12 @@ public:
     std::set<node_type> nodes_set(nodes_.begin(),nodes_.end());
     nodes_.assign(nodes_set.begin(),nodes_set.end());
     std::sort(nodes_.begin(),nodes_.end());
+
+    PropertiesFile pf(properties_file);
+    pf.load([this](const std::string & s, PropertiesFile::PropertyContainer && props){
+        nodes_[find_node(s)].properties_ = props;
+        return true;
+    });
 
     for(const auto& edge : edges){
       const std::size_t ind0(find_node(std::get<0>(edge)));
