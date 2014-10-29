@@ -1,6 +1,7 @@
 import sys
 import os
 import cgi
+import re
 
 
 # Path to the pipe for communication with the daemon
@@ -22,6 +23,7 @@ f.close()
 # Open the pipe again, get the result and print it.
 f = open(pipe_path, 'r')
 data = f.read()
+data = re.sub(r'\/','_',data)
 f.close()
 print data
 
