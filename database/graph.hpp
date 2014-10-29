@@ -106,7 +106,7 @@ private:
         const std::string label(a.second);
         if(used_indices.find(ind) == used_indices.end()){
 
-          sub_graph += nodes_[index].name_ + " -- " + nodes_[ind].name_ + " [label=" + label + "]" + ";\n";
+          sub_graph += nodes_[index].name_ + " -- " + nodes_[ind].name_ + " [label=\"" + label + "\"]" + ";\n";
           build_sub_graph(ind,depth-1,used_indices,sub_graph);
         }
       }
