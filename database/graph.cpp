@@ -48,10 +48,10 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
     sub_graph += "nf [label=\"NOT FOUND\"];\n";
   else{
     // std::set<std::size_t> used_indices;
-    // build_sub_graph_dfs(index,depth,used_indices,sub_graph);
+    // build_sub_graph_depth(index,depth,used_indices,sub_graph);
     //----
     std::set<std::size_t> used_indices({index});
-    build_sub_graph_bfs({index},depth,used_indices,sub_graph);
+    build_sub_graph_breadth({index},depth,used_indices,sub_graph);
   }
 
   sub_graph += "}";
@@ -63,7 +63,7 @@ void graph::insert_node(const node_type& node)
   nodes_.push_back(node);
 }
 
-void graph::build_sub_graph_dfs(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
+void graph::build_sub_graph_depth(const std::size_t index, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
 {
   sub_graph += nodes_[index].id_ + " [label=\"" + nodes_[index].name_ + "\"];\n";
 
@@ -74,12 +74,12 @@ void graph::build_sub_graph_dfs(const std::size_t index, const std::size_t depth
       const std::string label(a.second);
       if(used_indices.find(ind) == used_indices.end()){
         sub_graph += nodes_[index].id_ + " -- " + nodes_[ind].id_ + " [label=\"" + label + "\"];\n";
-        build_sub_graph_dfs(ind,depth-1,used_indices,sub_graph);
+        build_sub_graph_depth(ind,depth-1,used_indices,sub_graph);
       }
     }
 }
 
-void graph::build_sub_graph_bfs(const std::vector<std::size_t>& indices0, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
+void graph::build_sub_graph_breadth(const std::vector<std::size_t>& indices0, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
 {
   for(const auto ind0 : indices0)
     sub_graph += nodes_[ind0].id_ + " [label=\"" + nodes_[ind0].name_ + "\"];\n";
@@ -98,7 +98,7 @@ void graph::build_sub_graph_bfs(const std::vector<std::size_t>& indices0, const 
         }
       }
 
-    build_sub_graph_bfs(indices1,depth-1,used_indices,sub_graph);
+    build_sub_graph_breadth(indices1,depth-1,used_indices,sub_graph);
   }
         
 }
