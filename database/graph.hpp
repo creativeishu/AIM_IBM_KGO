@@ -8,6 +8,7 @@
 #include <exception>
 #include <set>
 #include <iostream>
+#include <tuple>
 
 #include "parse.hpp"
 #include "utility.hpp"
@@ -36,7 +37,7 @@ public:
 
   std::string name_;
   std::vector<double> properties_;
-  std::vector<unsigned> neighbours_;
+  std::vector<std::pair<std::size_t,std::string> > neighbours_;
 };
 
 class graph
@@ -50,11 +51,11 @@ public:
   {
     EdgeFile ef(graph_file);
 
-    std::vector<std::pair<std::string,std::string> > edges;
-    ef.load([this, &edges] (const std::string & s, const std::string &, const std::string &v) {
+    std::vector<std::tuple<std::string,std::string,std::string> > edges;
+    ef.load([this, &edges] (const std::string & s, const std::string & p, const std::string &v) {
         this->nodes_.push_back(node_type(s, std::vector<double>()));
         this->nodes_.push_back(node_type(v, std::vector<double>()));
-        edges.push_back(std::make_pair(s,v));
+        edges.push_back(std::make_tuple(s,p,v));
         return true;
       });
 
@@ -63,9 +64,9 @@ public:
     std::sort(nodes_.begin(),nodes_.end());
 
     for(const auto& edge : edges){
-      const std::size_t ind0(find_node(edge.first));
-      const std::size_t ind1(find_node(edge.second));
-      nodes_[ind0].neighbours_.push_back(ind1);
+      const std::size_t ind0(find_node(std::get<0>(edge)));
+      const std::size_t ind1(find_node(std::get<2>(edge)));
+      nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
     }
 
     // for(const auto& node : nodes_)
@@ -100,12 +101,15 @@ private:
 
     used_indices.insert(index);
     if(depth > 0)
-      for(const auto a : nodes_[index].neighbours_)
-        if(used_indices.find(a) == used_indices.end()){
+      for(const auto a : nodes_[index].neighbours_){
+        const std::size_t ind(a.first);
+        const std::string label(a.second);
+        if(used_indices.find(ind) == used_indices.end()){
 
-          sub_graph += nodes_[index].name_ + " -- " + nodes_[a].name_ + " [label=contains in]" + ";\n";
-          build_sub_graph(a,depth-1,used_indices,sub_graph);
+          sub_graph += nodes_[index].name_ + " -- " + nodes_[ind].name_ + " [label=" + label + "]" + ";\n";
+          build_sub_graph(ind,depth-1,used_indices,sub_graph);
         }
+      }
   }
 
   std::size_t find_node(const std::string& query) const
