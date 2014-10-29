@@ -24,7 +24,7 @@ void EdgeFile::load(std::function<bool (const std::string &, const std::string &
   rapidjson::Document d;
 
   if (d.ParseStream(*is_).HasParseError())
-    return;
+    throw std::runtime_error("invalid json");
 
   if (!d.IsArray())
     throw std::runtime_error("Root element is not an array");
@@ -64,7 +64,7 @@ void PropertiesFile::load(std::function<bool (const std::string &, PropertyConta
   rapidjson::Document d;
 
   if (d.ParseStream(*is_).HasParseError())
-    return;
+    throw std::runtime_error("invalid json");
 
   if (!d.IsObject())
     throw std::runtime_error("Root element is not an object");
