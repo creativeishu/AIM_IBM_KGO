@@ -59,9 +59,7 @@ public:
 
 private:
 
-  void build_sub_graph_depth(const std::size_t, const std::size_t, std::set<std::size_t>&, std::string&) const;
-
-  void build_sub_graph_breadth(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
+  void build_sub_graph(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
 
   std::size_t find_node(const std::string&) const;
 
