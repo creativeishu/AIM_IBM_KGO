@@ -9,14 +9,15 @@ static const char* pipe_path = "/tmp/aim2014_graph_pipe";
 
 int main(int argc, char* argv[])
 {
-    if(argc != 2)
+    if(argc != 3)
     {
-        std::cout << "Usage: "<< argv[0] << " <graph_file>" << std::endl;
+        std::cout << "Usage: "<< argv[0] << " <graph_file> <properties_file>" << std::endl;
         return -1;
     }
-    const std::size_t depth(3);
+    const std::size_t depth(1);
     const std::string graph_file(argv[1]);
-    const graph G(graph_file);
+    const std::string properties_file(argv[2]);
+    const graph G(graph_file,properties_file);
 
     while(1)
     {
