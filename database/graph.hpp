@@ -99,6 +99,8 @@ private:
     // std::cout << nodes_[index].neighbours_ << std::endl;
     // std::cout << depth << std::endl;
 
+    sub_graph += nodes_[index].name_ + ";\n";
+
     used_indices.insert(index);
     if(depth > 0)
       for(const auto a : nodes_[index].neighbours_){
