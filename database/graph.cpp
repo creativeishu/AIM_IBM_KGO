@@ -45,16 +45,24 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
     nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
   }
 
+  const std::vector<std::pair<std::string,double> > properties({
+      std::make_pair("melting_point",0.05)
+        });
+
+  for(const auto& a : properties)
+    add_similarity(a.first,a.second);
+
+  //----------
+
+  // for(const auto a : vec)
+  //   std::cout << a.index << ' ' << a.value << std::endl;
+
   // for(const auto& node : nodes_){
   //   for(const auto a : node.properties_)
   //     std::cout << a << std::endl;
   //   std::cout << "***********" << std::endl;
   //   std::cin.get();
   // }
-
-  // exit(0);
-
-  //TODO: additional edges based on similatiry of properties
 
   // std::cout << nodes_.size() << ' ' << edges.size() << std::endl; exit(0);
 
@@ -66,12 +74,12 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
   //   if(dist[i] > 0)
   //     std::cout << i << ' ' << dist[i] << std::endl;
 
-  // exit(0);
-
   // for(const auto& node : nodes_)
   //   std::cout << node.id_ << " | " << node.name_ << std::endl;
 
   // exit(0);
+
+  //----------
 }
 
 std::string graph::query_graph(const std::string& query, const std::size_t depth, const bool by_name) const
@@ -91,59 +99,101 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
 
 void graph::build_sub_graph(const std::vector<std::size_t>& indices0, const std::size_t depth, std::set<std::size_t>& used_indices, std::string& sub_graph) const
 {
-    for(const auto ind0 : indices0) {
-        sub_graph += nodes_[ind0].id_;
-        sub_graph += " [";
-        sub_graph += "label=\"" + nodes_[ind0].name_ + "\"";
+  for(const auto ind0 : indices0) {
+    sub_graph += nodes_[ind0].id_;
+    sub_graph += " [";
+    sub_graph += "label=\"" + nodes_[ind0].name_ + "\"";
         
-        std::string title_str = "";
-        node_type::PropertyContainer::const_iterator match;
+    std::string title_str = "";
+    node_type::PropertyContainer::const_iterator match;
         
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/melting_point");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/boiling_point");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/melting_point");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/boiling_point");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/atomic_mass");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/atomic_mass");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/isotope/mass");
-        if (match != nodes_[ind0].properties_.end())
-            title_str += "Mass : " + match->second + "u<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/melting_point");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Melting T : " + match->second + " °C<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/boiling_point");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Boiling T : " + match->second + " °C<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/melting_point");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Melting T : " + match->second + " °C<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/boiling_point");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Boiling T : " + match->second + " °C<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/atomic_mass");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Mass : " + match->second + "u<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/atomic_mass");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Mass : " + match->second + "u<br />";
+    match = nodes_[ind0].properties_.find("measurement./chemistry/isotope/mass");
+    if (match != nodes_[ind0].properties_.end())
+      title_str += "Mass : " + match->second + "u<br />";
         
         
-        if (!title_str.empty())
-          sub_graph += " title=\""+ title_str + "\"";
+    if (!title_str.empty())
+      sub_graph += " title=\""+ title_str + "\"";
         
-        sub_graph += "];\n";
-    }
-    if(depth > 0){
+    sub_graph += "];\n";
+  }
+  if(depth > 0){
         
-        std::vector<std::size_t> indices1;
-        for(const auto ind0 : indices0)
-            for(const auto b : nodes_[ind0].neighbours_){
-                const std::size_t ind1(b.first);
-                if(used_indices.find(ind1) == used_indices.end()){
-                    const std::string label(b.second);
-                    used_indices.insert(ind1);
-                    sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
-                    indices1.push_back(ind1);
-                }
-            }
+    std::vector<std::size_t> indices1;
+    for(const auto ind0 : indices0)
+      for(const auto b : nodes_[ind0].neighbours_){
+        const std::size_t ind1(b.first);
+        if(used_indices.find(ind1) == used_indices.end()){
+          const std::string label(b.second);
+          used_indices.insert(ind1);
+          sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
+          indices1.push_back(ind1);
+        }
+      }
         
-        build_sub_graph(indices1,depth-1,used_indices,sub_graph);
-    }
+    build_sub_graph(indices1,depth-1,used_indices,sub_graph);
+  }
     
+}
+
+void graph::add_similarity(const std::string property, const double threshold)
+{
+  std::vector<prop_type> vec;
+  for(std::size_t ind = 0; ind < nodes_.size(); ++ind)
+    for(const auto a : nodes_[ind].properties_)
+      if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
+        vec.push_back(prop_type(ind,std::stod(a.second)));
+        break;
+      }
+
+  std::sort(vec.begin(),vec.end(),std::less<prop_type>());
+
+  const double min_p(vec[0].value);
+  const double max_p(vec[vec.size()-1].value);
+
+  const double offset(0.0-min_p);
+  const double factor(1.0/(max_p+offset));
+
+  for(auto& a : vec)
+    a.value = (a.value+offset)*factor;
+
+  for(std::size_t i = 0; i < vec.size(); ++i){
+
+    const std::size_t ind0(vec[i].index);
+    const double value0(vec[i].value);
+    long j;
+
+    j = long(i)-1;
+    while(j >= 0 && std::fabs(vec[std::size_t(j)].value - value0) < threshold){
+      nodes_[ind0].neighbours_.push_back(std::make_pair(vec[std::size_t(j)].index,property));
+      --j;
+    }
+
+    j = long(i)+1;
+    while(j < long(vec.size()) && std::fabs(vec[std::size_t(j)].value - value0) < threshold){
+      nodes_[ind0].neighbours_.push_back(std::make_pair(vec[std::size_t(j)].index,property));
+      ++j;
+    }
+
+  }
 }
 
 std::size_t graph::find_node(const std::string& query) const
@@ -154,16 +204,12 @@ std::size_t graph::find_node(const std::string& query) const
 
 std::size_t graph::find_node_id(const std::string& query) const
 {
-  std::unordered_map<std::string, std::size_t>::const_iterator match = lookup_id_.find(query);
-  if (match == lookup_id_.end())
-    return nodes_.size();
-  return match->second;
+  const auto it(lookup_id_.find(query));
+  return (it == lookup_id_.end() ? nodes_.size() : it->second);
 }
 
 std::size_t graph::find_node_name(const std::string& query) const
 {
-  std::unordered_map<std::string, std::size_t>::const_iterator match = lookup_name_.find(query);
-  if (match == lookup_name_.end())
-    return nodes_.size();
-  return match->second;
+  const auto it(lookup_name_.find(query));
+  return (it == lookup_name_.end() ? nodes_.size() : it->second);
 }
