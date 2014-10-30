@@ -27,7 +27,7 @@ int main()
   
   std::size_t ix = G.find_node_id(query);
   std::cout << "Found " << ix << std::endl;
-  std::cout << "It is : " << G.get(ix).find_property("name")->second << std::endl;
+  std::cout << "It is : " << G.get(ix).name_ << std::endl;
   
   G.query_graph_parallel(query,depth,"melting_point",120.0,by_name);
 
