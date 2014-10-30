@@ -21,8 +21,8 @@ def main(args):
 
     for edge in edges:
         if edge[1] in edges_to_bidirectionalize.keys():
-            if not ([edge[2],edges_to_bidirectionalize[edge[1]],edge[0]) in edges:
-                edges.append([edge[2],edges_to_bidirectionalize[edge[1]],edge[0])
+            if not [edge[2],edges_to_bidirectionalize[edge[1]],edge[0]] in edges:
+                edges.append([edge[2],edges_to_bidirectionalize[edge[1]],edge[0]])
 
     json.dump(edges, open('bidir_edges.txt','w'),indent=2)
     json.dump(props, open('bidir_props.txt','w'),indent=2)
