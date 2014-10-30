@@ -106,6 +106,14 @@ public:
     return nodes_[i];
   }
 
+  /**
+   * Get the number of nodes
+   */
+  size_t count() const
+  {
+    return nodes_.size();
+  }
+
 private:
 
   void add_similarity(const std::string property, const double threshold);
