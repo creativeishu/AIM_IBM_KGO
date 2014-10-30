@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   for (auto e: nodes)
   {
     const auto & n(G.get(e.second));
-    const double v(std::stod(n.get_property(property)->second));
+    const double v(std::stod(n.find_property(property)->second));
     std::cout << n.name_ << ": " <<  v << " (delta: " << e.first << ")" << std::endl;
   }
 

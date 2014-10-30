@@ -29,7 +29,7 @@ class graph
     bool operator<(const std::string& in) const {return ((this->id_).compare(in) < 0);}
     bool operator==(const node_type& in) const {return this->id_ == in.id_;}
 
-    PropertyContainer::const_iterator get_property(const std::string & property) const
+    PropertyContainer::const_iterator find_property(const std::string & property) const
     {
       const auto prop_match(std::regex(".*" + property + ".*"));
       return std::find_if(
