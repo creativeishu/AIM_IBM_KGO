@@ -32,7 +32,6 @@ int main()
   std::cout << "It is : " << G.get(ix).name_ << std::endl;
   
   const std::string property("melting_point");
-  const double threshold(120.0);
 
   const std::size_t N(16);
 
@@ -42,7 +41,7 @@ int main()
 
   std::cout << "----------" << std::endl;
 
-  const auto indices0(G.query_graph_parallel(query,depth,property,threshold,by_name));
+  const auto indices0(G.query_graph_parallel(query,depth,N,property,by_name));
   for(const auto a : indices0)
     std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 

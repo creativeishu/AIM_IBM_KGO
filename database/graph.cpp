@@ -175,7 +175,7 @@ std::vector<std::size_t> graph::query_graph_exact(const std::string& query, cons
   return indices_tot_vec;
 }
 
-std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const
+std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const
 {
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
 
@@ -194,25 +194,27 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
 
   const auto value0(std::stod(it0->second));
 
-  std::size_t num_threads;
+  int num_threads;
 #pragma omp parallel
 #pragma omp master
   {
     num_threads = omp_get_num_threads();
   }
 
-  std::vector<std::set<std::size_t> > indices_tot(num_threads);
+  std::vector<std::set<prop_type> > indices_tot(num_threads);
 
 #pragma omp parallel
   {
-    const unsigned thread_num(omp_get_thread_num());
+    omp_set_num_threads(num_threads);
+    const int thread_num(omp_get_thread_num());
 
     std::mt19937 generator(thread_num);
     const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
 
     auto& indices_loc(indices_tot[thread_num]);
+    std::set<std::size_t> visited_nodes;
 
-    indices_loc.insert(index);
+    indices_loc.insert(prop_type(index,0.0));
     std::size_t ind0(index);
     for(std::size_t d = 0; d <= depth; ++d){
       const std::size_t ns(nodes_[ind0].neighbours_.size());
@@ -221,8 +223,15 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
         const std::size_t ind1(nodes_[ind0].neighbours_[rand_n].first);
 
         const auto it1(nodes_[ind1].find_property(property));
-        if(it1 != nodes_[ind1].properties_.end() && std::fabs(std::stod(it1->second) - value0) < threshold)
-          indices_loc.insert(ind1);
+        if(it1 != nodes_[ind1].properties_.end() && visited_nodes.find(ind1) == visited_nodes.end()){
+          indices_loc.insert(prop_type(ind1,std::fabs(std::stod(it1->second) - value0)));
+          if(indices_loc.size()>N){
+            auto it(indices_loc.end());
+            --it;
+            indices_loc.erase(it);
+          }
+          visited_nodes.insert(ind1);
+        }
 
         ind0 = ind1;
       }
@@ -230,11 +239,15 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
 
   }
 
-  std::set<std::size_t> indices_tot_set;
+  std::set<prop_type> indices_tot_set;
   for(const auto& a : indices_tot)
     std::copy( a.begin(), a.end(), std::inserter( indices_tot_set, indices_tot_set.end() ) );
 
-  indices_tot_vec.assign(indices_tot_set.begin(),indices_tot_set.end());
+  for(const auto a : indices_tot_set){
+    indices_tot_vec.push_back(a.index);
+    if(indices_tot_vec.size() >= N)
+      break;
+  }
 
   return indices_tot_vec;
 }

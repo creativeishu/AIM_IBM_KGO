@@ -83,7 +83,7 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
-  std::vector<std::size_t> query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const;
+  std::vector<std::size_t> query_graph_parallel(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const;
 
   std::vector<std::size_t> query_graph_exact(const std::string& query, const std::size_t N, const std::string property, const bool by_name) const;
 
