@@ -192,7 +192,7 @@ void graph::add_similarity(const std::string property, const double threshold)
 
 void graph::visit_nodes_bfs(
                             const std::size_t root,
-                            std::function<bool (const node_type &)> f,
+                            std::function<bool (size_t)> f,
                             const std::size_t depth) const
 {
   std::set<size_t> visited({ root });
