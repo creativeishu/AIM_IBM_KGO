@@ -75,7 +75,7 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
 
   const size_t max_label_length(20);
 
-  std::string sub_graph = "graph G {\n";
+  std::string sub_graph = "digraph G {\n";
 
   std::set<std::size_t> indices_tot({index});
   std::vector<std::size_t> indices0({index});
@@ -122,14 +122,13 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
       for(const auto ind0 : indices0)
         for(const auto b : nodes_[ind0].neighbours_){
           const std::size_t ind1(b.first);
-          if(indices_tot.find(ind1) == indices_tot.end()){
-            std::string label(b.second);
-            if (label.length() > max_label_length)
-              label.replace(max_label_length/2, label.length() - max_label_length, "...");
-            indices_tot.insert(ind1);
-            sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
+          if(indices_tot.find(ind1) == indices_tot.end())
             indices1.push_back(ind1);
-          }
+          std::string label(b.second);
+          if (label.length() > max_label_length)
+            label.replace(max_label_length/2, label.length() - max_label_length, "...");
+          indices_tot.insert(ind1);
+          sub_graph += nodes_[ind0].id_ + " -> " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
         }
 
       std::swap(indices0,indices1);
