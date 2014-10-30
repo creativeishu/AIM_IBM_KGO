@@ -29,7 +29,12 @@ int main(int argc, char *argv[])
     print_usage(argv[0], 2);
   }
 
+  ClockMeasure c;
+
+  c.tick();
   const graph G(graph_file, properties_file);
+  double load_time(c.tock());
+
   const std::string query(argv[1]);
   const std::string property(argv[2]);
 
@@ -46,7 +51,10 @@ int main(int argc, char *argv[])
   std::cout << "RESULTS" << std::endl;
   std::cout << "=======" << std::endl << std::endl;
 
+  c.tick();
   const auto & nodes(G.find_nodes_closest_by_property_comparison(query, depth, by_name, property, limit));
+  double search_time(c.tock());
+
   for (auto e: nodes)
   {
     const auto & n(G.get(e.second));
@@ -54,5 +62,10 @@ int main(int argc, char *argv[])
     std::cout << n.name_ << ": " <<  v << " (delta: " << e.first << ")" << std::endl;
   }
 
+  std::cout << std::endl;
+  std::cout << "TIMING" << std::endl;
+  std::cout << "======" << std::endl << std::endl;
+  std::cout << "loading: " << load_time << std::endl;
+  std::cout << "search:  " << search_time << std::endl;
   return 0;
 }
