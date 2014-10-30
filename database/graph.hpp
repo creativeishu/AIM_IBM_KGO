@@ -63,14 +63,14 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
+  // std::string query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const;
+
   /**
    * Print out nodes connected to the looked-up one up to a certain depth
    */
   void dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const;
 
 private:
-
-  void build_sub_graph(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
 
   void add_similarity(const std::string property, const double threshold);
 

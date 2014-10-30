@@ -4,7 +4,8 @@
 #include <tuple>
 #include <regex>
 #include <stack>
-#include <random>
+// #include <random>
+// #include <omp.h>
 
 graph::graph(const std::string& graph_file, const std::string& properties_file)
 {
@@ -127,13 +128,24 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
   return sub_graph;
 }
 
-// std::string graph::query_graph_random(const std::string& query, const std::size_t depth, const bool by_name) const
+// std::string graph::query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const
 // {
-//   std::mt19937 generator(8);
-//   const std::function<double()> rng;
+//   std::vector<std::vector<std::size_t> > nodes_tot(8);
 
+//   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
 
+// #pragma omp parallel
+//   {
+//     std::mt19937 generator(omp_get_thread_num());
+//     const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
 
+//     std::cout << omp_get_thread_num() << ' ' << rng() << std::endl;
+
+//   }
+
+//   //TODO: each thread compares vectors with the thread next to it
+
+//   exit(0);
 // }
 
 void graph::add_similarity(const std::string property, const double threshold)

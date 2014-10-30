@@ -7,6 +7,7 @@ int main()
   const std::size_t depth(3);
   const std::string graph_file("../../edges_test.txt");
   const std::string properties_file("../../props_test.txt");
+
   const graph G(graph_file,properties_file);
 
   const std::string query("/m/0lbt3");
