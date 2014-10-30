@@ -9,20 +9,6 @@ def main(args):
 
 
     #list here :        bad id      good id
-    ids_to_replace = [("/m/02kctdj" ,"/m/025rsfk"),
-                      ("/m/0bnvbd4",  "/m/025rw19" ),
-                      ("/m/02kcv_c",  "/m/025rw19" ),
-                      ("/m/0bnv6p5",  "/m/025svlc" ),
-                      ("/m/02kcq04",  "/m/025s7j4" ),
-                      ("/m/02kcqln",  "/m/025sf9q" ),
-                      ("/m/063z0gk",  "/m/05_f5y5" ),
-                      ("/m/0640s9v",  "/m/05_f5zh" ),
-                      ("/m/08rbl0" ,  "/m/05_f5wn" ),
-                      ("/m/0ggk182",  "/m/0838f"   ),
-                      ("/m/02kcq1_",  "/m/025sf0_" ),
-                      ("/m/0ggk3fn",  "/m/06x4c"   ),
-                      ("/m/02kcr3f",  "/m/025tkrf" ),
-                      ("/m/02kcjvf",  "/m/025tkqy" )]
     ids_to_replace = []
 
     edges = json.load(open(edge_file))
@@ -30,17 +16,18 @@ def main(args):
     assert (type(edges)==list)    
     assert (type(props)==dict)    
 
-    for x in props:
-        if len( props[x]['name']) > 25:
-            props[x]['name'] = props[x]['name'][0:10]+"..."
-        print props[x]['name']
+
+   #for x in props:
+   #    if len( props[x]['name']) > 25:
+   #        props[x]['name'] = props[x]['name'][0:10]+"..."
+   #    print props[x]['name']
 
     all_names = [props[x]['name'] for x in props]
     all_names_unique = set(all_names)
     for name in all_names_unique:
         dupl_names = []
         for k,prop in props.items():
-            if prop['name']==name:
+            if prop['name'].lower()==name.lower():
                 dupl_names.append(k)
         if len(dupl_names)>1:
             root_prop = dupl_names[0]
@@ -64,8 +51,8 @@ def main(args):
     for my_id in bad_ids:
         props.pop(my_id,None)
 
-    json.dump(props, open('fixed_props.txt','w'))
-    json.dump(edges, open('fixed_edges.txt','w'))
+    json.dump(props, open('fixed_props.txt','w'),indent=2)
+    json.dump(edges, open('fixed_edges.txt','w'),indent=2)
 
 def chunks(l, n):
     """ Yield successive n-sized chunks from l.
