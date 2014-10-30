@@ -103,9 +103,6 @@ public:
    */
   node_type get(size_t i) const
   {
-    if (i >= nodes_.size())
-      return node_type("INVALID");
-
     return nodes_[i];
   }
 
