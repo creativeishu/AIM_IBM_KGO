@@ -11,30 +11,41 @@
 #include <set>
 #include <unordered_map>
 
-struct node_type
-{
-  typedef std::unordered_map<std::string, std::string> PropertyContainer;
-
-  node_type(const std::string& id)
-    : id_(id)
-    , properties_(PropertyContainer())
-    , name_("nolabel")
-  {}
-
-  bool operator<(const node_type& in) const {return ((this->id_).compare(in.id_) < 0);}
-  bool operator<(const std::string& in) const {return ((this->id_).compare(in) < 0);}
-  bool operator==(const node_type& in) const {return this->id_ == in.id_;}
-
-  //*******
-
-  std::string id_;
-  PropertyContainer properties_;
-  std::string name_;
-  std::vector<std::pair<std::size_t,std::string> > neighbours_;
-};
-
 class graph
 {
+  struct node_type
+  {
+    typedef std::unordered_map<std::string, std::string> PropertyContainer;
+
+    node_type(const std::string& id)
+      : id_(id)
+      , properties_(PropertyContainer())
+      , name_("nolabel")
+    {}
+
+    bool operator<(const node_type& in) const {return ((this->id_).compare(in.id_) < 0);}
+    bool operator<(const std::string& in) const {return ((this->id_).compare(in) < 0);}
+    bool operator==(const node_type& in) const {return this->id_ == in.id_;}
+
+    //*******
+
+    std::string id_;
+    PropertyContainer properties_;
+    std::string name_;
+    std::vector<std::pair<std::size_t,std::string> > neighbours_;
+  };
+
+  struct prop_type
+  {
+    prop_type(const std::size_t ind, const double val)
+      : index(ind)
+      , value(val)
+    {}
+
+    std::size_t index;
+    double value;
+    bool operator<(const prop_type& in) const {return this->value < in.value;}
+  };
 
 public:
 
@@ -52,13 +63,26 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
+  /**
+   * Print out nodes connected to the looked-up one up to a certain depth
+   */
+  void dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const;
+
 private:
 
   void build_sub_graph(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
 
+  void add_similarity(const std::string property, const double threshold);
+
   std::size_t find_node(const std::string&) const;
   std::size_t find_node_id(const std::string&) const;
   std::size_t find_node_name(const std::string&) const;
+
+  void visit_nodes_bfs(
+      const std::size_t root,
+      std::function<bool (const node_type &)> f,
+      const std::size_t depth = std::numeric_limits<size_t>::max()
+  ) const;
 
   //*******
 

@@ -27,7 +27,7 @@ def process_query():
         if 'id:' in val:
             search_name = False
             val = val.replace('id:', '')
-            val = re.sub(r'_','/',val)
+            val = re.sub(r'___','/',val)
     except:
         print "graph g { n [label=\"" + val +"\"]; }"
         return
@@ -40,7 +40,7 @@ def process_query():
 # Open the pipe again, get the result and print it.
     f = open(pipe_path, 'r')
     data = f.read()
-    data = re.sub(r'\/','_',data)
+    data = re.sub(r'\/','___',data)
     f.close()
     print data
     return
