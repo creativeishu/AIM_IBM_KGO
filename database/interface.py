@@ -43,7 +43,7 @@ def process_query():
 # Open the pipe again, get the result and print it.
     f = open(pipe_path, 'r')
     data = f.read()
-    data = re.sub(r'\/','___',data)
+    data = re.sub(r'\/m\/','___m___',data)
     f.close()
     print data
     return
