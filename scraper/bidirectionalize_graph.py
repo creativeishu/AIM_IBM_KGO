@@ -11,7 +11,8 @@ def main(args):
     #list here :        bad id      good id
     edges_to_bidirectionalize = {
             "subclass_of./engineering/material/parent_material_class": "child_material_of_class" ,
-            "category./chemistry/chemical_element/chemical_series" : "member_of_chemical_series"
+            "category./chemistry/chemical_element/chemical_series" : "member_of_chemical_series",
+            "narrower_than./chemistry/isotope/isotope_of":"is_isotope_of"
             }
 
     edges = json.load(open(edge_file))
