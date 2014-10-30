@@ -294,33 +294,34 @@ void graph::add_similarity(const std::string property, const double threshold)
 
 void graph::visit_nodes_bfs(
                             const std::size_t root,
-                            std::function<bool (size_t)> f,
+                            std::function<bool (const std::vector<size_t> &)> f,
                             const std::size_t depth) const
 {
-  std::set<size_t> visited({ root });
-  std::stack<std::pair<size_t,size_t>> queue({ std::make_pair(root, 0) });
+  std::set<size_t> visited({ root }); // to track the visited nodes, the index is enough
+  std::stack<std::vector<size_t>> queue({std::vector<size_t>({root})}); // to get the path of the nodes, we need the full path
 
   while (!queue.empty())
     {
-      size_t t(0), d(0);
-      std::tie(t, d) = queue.top();
+      std::vector<size_t> p = queue.top();
       queue.pop();
 
-      // call the function on the node and terminate if it returns false
-      if (!f(t))
+      // call the function on the path and terminate if it returns false
+      if (!f(p))
         return;
 
       // do not add further neighbours since we reached maximum depth already
-      if (d >= depth)
+      if (p.size() > depth)
         continue;
 
-      for (size_t n(0); n < nodes_[t].neighbours_.size(); ++n)
+      for (size_t n(0); n < nodes_[p.back()].neighbours_.size(); ++n)
         {
-          size_t n_i(nodes_[t].neighbours_[n].first);
+          size_t n_i(nodes_[p.back()].neighbours_[n].first);
           if (visited.find(n_i) == visited.end())
             {
               visited.emplace(n_i);
-              queue.emplace(n_i, d+1);
+              std::vector<size_t> n_p(p);
+              n_p.push_back(n_i);
+              queue.push(n_p);
             }
         }
     }
@@ -332,21 +333,24 @@ void graph::dump_nodes(const std::string& query, const std::size_t depth, const 
   if(index == nodes_.size())
     return;
 
-  auto printer = [this](size_t node_index) {
-    std::cout << nodes_[node_index].id_ << " (name: " << nodes_[node_index].name_ << ")" << std::endl;
+  auto printer = [this](const std::vector<size_t> & node_path) {
+    std::cout << nodes_[node_path.front()].id_;
+    for (auto i(node_path.begin()+1); i != node_path.end(); ++i)
+      std::cout << " -> " << nodes_[*i].id_ << " (name: " << nodes_[*i].name_ << ")";
+    std::cout << std::endl;
     return true;
   };
   visit_nodes_bfs(index, printer, depth);
 }
 
-std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
+std::map<double,std::vector<size_t> > graph::find_nodes_closest_by_property_comparison(
       const std::string& query,
       const std::size_t depth,
       const bool by_name,
       const std::string & property,
       const std::size_t limit) const
 {
-  std::map<double,size_t> nodes_found;
+  std::map<double,std::vector<size_t> > nodes_found;
 
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
   if(index == nodes_.size())
@@ -360,17 +364,17 @@ std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
 
   const double ref(stod(ref_p_i->second));
 
-  auto f = [this,ref,&nodes_found,&property,&limit](size_t n_i) {
+  auto f = [this,ref,&nodes_found,&property,&limit](const std::vector<size_t> n_p) {
     // get an iterator to the wanted property
-    const auto p_i(nodes_[n_i].find_property(property));
+    const auto p_i(nodes_[n_p.back()].find_property(property));
 
     // ignore the node if the property does not exist
-    if (p_i == nodes_[n_i].properties_.end())
+    if (p_i == nodes_[n_p.back()].properties_.end())
       return true;
 
     // do a sorted insert
     const double v(std::stod(p_i->second));
-    nodes_found.emplace(std::abs(ref - v), n_i);
+    nodes_found.emplace(std::abs(ref - v), n_p);
 
     // reduce the length of the list to limit+1 (since the root node will always be part of it)
     if (nodes_found.size() > (limit+1))
