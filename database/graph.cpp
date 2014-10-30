@@ -81,25 +81,16 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
         std::string title_str = "";
         node_type::PropertyContainer::const_iterator match;
         
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/melting_point");
+        match = nodes_[ind0].find_property("melting_point");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/boiling_point");
+        match = nodes_[ind0].find_property("boiling_point");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/melting_point");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/boiling_point");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/atomic_mass");
+        match = nodes_[ind0].find_property("atomic_mass");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/atomic_mass");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/isotope/mass");
+        match = nodes_[ind0].find_property("isotope\/mass");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Mass : " + match->second + "u<br />";
         
