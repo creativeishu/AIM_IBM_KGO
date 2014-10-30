@@ -28,6 +28,19 @@ class graph
     bool operator<(const std::string& in) const {return ((this->id_).compare(in) < 0);}
     bool operator==(const node_type& in) const {return this->id_ == in.id_;}
 
+    PropertyContainer::const_iterator get_property(const std::size_t index, const std::string property) const
+    {
+      double value;
+      bool found(false);
+      for(const auto a : properties_)
+        if(){
+          value = std::stod(a.second);
+          found = true;
+          break;
+        }
+      return std::make_pair(value,found);
+    }
+
     //*******
 
     std::string id_;
@@ -64,7 +77,7 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
-  // std::string query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const;
+  void query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const;
 
   /**
    * Print out nodes connected to the looked-up one up to a certain depth

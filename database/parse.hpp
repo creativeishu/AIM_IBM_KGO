@@ -41,6 +41,7 @@ public:
 
 private:
   std::array<char, MAX_READ_BUFFER> readBuffer_;
+  const std::string filename_;
   FILE * fh_;
   rapidjson::FileReadStream * is_;
 };
@@ -72,6 +73,7 @@ public:
 
 private:
   std::array<char, MAX_READ_BUFFER> readBuffer_;
+  const std::string filename_;
   FILE * fh_;
   rapidjson::FileReadStream * is_;
 };
