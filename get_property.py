@@ -5,7 +5,7 @@ import numpy
 import sys
 import time
 
-f = open('props_test.txt','r')
+f = open('props_multiline.txt','r')
 outfile = open('props_test_new.txt','w')
 nodeIDS = []
 names = []
@@ -30,7 +30,7 @@ while True:
         if len(name)<2:
             continue
 
-        if name == 'Uranium-231':
+        if name == 'Calcium':
             print "warning",ID,'Line:',i
 
 
