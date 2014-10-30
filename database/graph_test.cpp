@@ -15,7 +15,7 @@ int main()
         });
   G.create_property_edges(properties);
 
-  const std::string query("/m/059gn");
+  const std::string query("/m/03cl_tj");
   //const std::string query("Iron");
 
   const bool by_name(false);
@@ -27,9 +27,15 @@ int main()
   
   std::size_t ix = G.find_node_id(query);
   std::cout << "Found " << ix << std::endl;
-  std::cout << "It is : " << G.get(ix).find_property("name")->second << std::endl;
+  std::cout << "It is : " << G.get(ix).name_ << std::endl;
   
-  G.query_graph_parallel(query,depth,"melting_point",120.0,by_name);
+  const std::string property("melting_point");
+  const double threshold(120.0);
+
+  const auto indices(G.query_graph_parallel(query,depth,property,threshold,by_name));
+
+  for(const auto a : indices)
+    std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
   return 0;
 }
