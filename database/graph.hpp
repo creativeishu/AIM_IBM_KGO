@@ -10,6 +10,7 @@
 #include <cassert>
 #include <set>
 #include <unordered_map>
+#include <map>
 
 class graph
 {
@@ -69,6 +70,16 @@ public:
    * Print out nodes connected to the looked-up one up to a certain depth
    */
   void dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const;
+
+  /**
+   * Find a limited set of nodes based on property comparison (currently assumed to be a double)
+   */
+  std::map<double,size_t> find_nodes_closest_by_property_comparison(
+      const std::string& query,
+      const std::size_t depth,
+      const bool by_name,
+      const std::string & property,
+      const std::size_t limit) const;
 
 private:
 
