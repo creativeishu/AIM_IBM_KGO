@@ -7,10 +7,10 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <cassert>
 #include <set>
 #include <unordered_map>
 #include <map>
+#include <functional>
 
 class graph
 {
@@ -80,6 +80,12 @@ public:
       const bool by_name,
       const std::string & property,
       const std::size_t limit) const;
+
+  /**
+   * Create additional edges based on similarities within given properties
+   * \param properties List of pairs of properties and threshold value
+   */
+  void create_property_edges(const std::vector<std::pair<std::string, double> > properties);
 
   /**
    * Get the node corresponding to a given index

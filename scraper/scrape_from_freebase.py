@@ -21,7 +21,7 @@ def main(args):
             cursor, data = get_result_bunch(cursor)
             topic_ids = [x['id'][0] for x in data]
 
-            print "getting data for topics", runtime
+            print "getting data for topics", runtime*150
             data_per_topic = get_topic_for_id(topic_ids)
             if data_per_topic is not None:
                 data_to_files(data_per_topic,pf,ef)
