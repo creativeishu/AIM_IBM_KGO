@@ -141,6 +141,40 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
   return sub_graph;
 }
 
+std::vector<std::size_t> graph::query_graph_exact(const std::string& query, const std::size_t N, const std::string property, const bool by_name) const
+{
+  const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
+
+  std::vector<std::size_t> indices_tot_vec;
+
+  if(index == nodes_.size()){
+    std::cout << "NODE NOT FOUND" << std::endl;
+    return indices_tot_vec;
+  }
+
+  const auto it0(nodes_[index].find_property(property));
+  if(it0 == nodes_[index].properties_.end()){
+    std::cout << "NODE PROPERTY NOT FOUND" << std::endl;
+    return indices_tot_vec;
+  }
+
+  const auto value0(std::stod(it0->second));
+
+  std::vector<prop_type> vec;
+  for(std::size_t ind = 0; ind < nodes_.size(); ++ind){
+    const auto it(nodes_[ind].find_property(property));
+    if(it != nodes_[ind].properties_.end())
+      vec.push_back(prop_type(ind,std::fabs(std::stod(it->second)-value0)));
+  }
+
+  std::sort(vec.begin(),vec.end(),std::less<prop_type>());
+
+  for(unsigned i = 0; i < N && i < vec.size(); ++i)
+    indices_tot_vec.push_back(vec[i].index);
+
+  return indices_tot_vec;
+}
+
 std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const
 {
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));

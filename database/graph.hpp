@@ -85,6 +85,8 @@ public:
 
   std::vector<std::size_t> query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const;
 
+  std::vector<std::size_t> query_graph_exact(const std::string& query, const std::size_t N, const std::string property, const bool by_name) const;
+
   /**
    * Print out nodes connected to the looked-up one up to a certain depth
    */
