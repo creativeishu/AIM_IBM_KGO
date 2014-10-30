@@ -6,6 +6,12 @@
 // Path to the pipe used for communication (create with "mkfifo pipe_path" and set permissions right)
 static const char* pipe_path = "/tmp/aim2014_graph_pipe";
 
+inline std::string trim(std::string& str)
+{
+  str.erase(0, str.find_first_not_of(' '));       //prefixing spaces
+  str.erase(str.find_last_not_of(' ')+1);         //surfixing spaces
+  return str;
+}
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +20,7 @@ int main(int argc, char* argv[])
         std::cout << "Usage: "<< argv[0] << " <graph_file> <properties_file>" << std::endl;
         return -1;
     }
-    const std::size_t depth(1);
+    const std::size_t depth(2);
     const std::string graph_file(argv[1]);
     const std::string properties_file(argv[2]);
     const graph G(graph_file,properties_file);
@@ -25,8 +31,10 @@ int main(int argc, char* argv[])
         bool by_name;
         std::string query;
         std::ifstream ifs(pipe_path);
-        ifs >> by_name >> query;
+        ifs >> by_name;
+        getline(ifs, query);
         ifs.close();
+        trim(query);
         std::cout << "By name  " << by_name << std::endl;
         std::cout << "Received " << query << std::endl;
 
