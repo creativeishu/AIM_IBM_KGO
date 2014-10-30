@@ -20,7 +20,6 @@ int main(int argc, char* argv[])
         std::cout << "Usage: "<< argv[0] << " <graph_file> <properties_file>" << std::endl;
         return -1;
     }
-    const std::size_t depth(2);
     const std::string graph_file(argv[1]);
     const std::string properties_file(argv[2]);
     const graph G(graph_file,properties_file);
@@ -29,13 +28,15 @@ int main(int argc, char* argv[])
     {
         // Get the query
         bool by_name;
+        int depth;
         std::string query;
         std::ifstream ifs(pipe_path);
-        ifs >> by_name;
+        ifs >> by_name >> depth;
         getline(ifs, query);
         ifs.close();
         trim(query);
         std::cout << "By name  " << by_name << std::endl;
+        std::cout << "Depth    " << depth << std::endl;
         std::cout << "Received " << query << std::endl;
 
         // Reply to query
