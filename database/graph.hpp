@@ -39,6 +39,14 @@ class graph
         );
     }
 
+    bool search_neighbour(const std::size_t in) const
+    {
+      for(const auto& a : neighbours_)
+        if(a.first == in)
+          return true;
+      return false;
+    }
+
     //*******
 
     std::string id_;
@@ -66,7 +74,7 @@ public:
    * \param graph_file Path to a JSON file containing (subject,predicate,value) triples
    * \param properties_file Path to a JSON file containing a properties object for each subject/node
    */
-  graph(const std::string& graph_file, const std::string& properties_file);
+  graph(const std::string& graph_file, const std::string& properties_file, const bool undirected = false);
 
   /**
    * Query the graph
@@ -131,6 +139,7 @@ private:
 
   //*******
 
+  bool undirected_;
   std::vector<node_type> nodes_;
   std::unordered_map<std::string, std::size_t> lookup_id_, lookup_name_;
 };
