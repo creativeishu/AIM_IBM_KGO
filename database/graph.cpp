@@ -24,21 +24,27 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
   // std::sort(nodes_.begin(),nodes_.end());
 
   for(std::size_t i = 0; i < nodes_.size(); ++i)
-    lookup_id_.insert(std::make_pair(nodes_[i].id_,i));
+    // lookup_id_.insert(std::make_pair(nodes_[i].id_,i));
+    lookup_id_.emplace(nodes_[i].id_,i);
 
   PropertiesFile pf(properties_file);
   pf.load([this](const std::string & s, PropertiesFile::PropertyContainer && props){
       const std::size_t ind(find_node_id(s));
 
+      if(ind == nodes_.size())
+        return true;
+
       for(const auto a : props)
         if(std::regex_match (a.first, std::regex("(name)(.*)"))){
           const std::string name(a.second);
           nodes_[ind].name_ = name;
-          lookup_name_.insert(std::make_pair(name,ind));
+          // lookup_name_.insert(std::make_pair(name,ind));
+          lookup_name_.emplace(name,ind);
           break;
         }
 
       nodes_[ind].properties_ = props;
+
       return true;
     });
 
