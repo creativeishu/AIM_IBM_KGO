@@ -4,8 +4,8 @@
 #include <tuple>
 #include <regex>
 #include <stack>
-// #include <random>
-// #include <omp.h>
+#include <random>
+#include <omp.h>
 
 graph::graph(const std::string& graph_file, const std::string& properties_file)
 {
@@ -134,25 +134,51 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
   return sub_graph;
 }
 
-// std::string graph::query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const
-// {
-//   std::vector<std::vector<std::size_t> > nodes_tot(8);
+void graph::query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const
+{
+  std::size_t num_threads;
+#pragma omp parallel
+  {
+    num_threads = omp_get_num_threads();
+  }
 
-//   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
+  const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
 
-// #pragma omp parallel
-//   {
-//     std::mt19937 generator(omp_get_thread_num());
-//     const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
+  if(index == nodes_.size())
+    std::cout << "NODE NOT FOUND" << std::endl;
+  else{
 
-//     std::cout << omp_get_thread_num() << ' ' << rng() << std::endl;
+    std::vector<std::set<std::size_t> > nodes_tot(num_threads);
 
-//   }
+#pragma omp parallel
+    {
+      const unsigned thread_num(omp_get_thread_num());
 
-//   //TODO: each thread compares vectors with the thread next to it
+      std::mt19937 generator(thread_num);
+      const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
 
-//   exit(0);
-// }
+      auto& nodes_loc(nodes_tot[thread_num]);
+
+      nodes_loc.insert(index);
+      std::size_t ind0(index);
+      for(std::size_t d = 0; d <= depth; ++d){
+        const std::size_t rand_n(rng()%nodes_[ind0].neighbours_.size());
+        const std::size_t ind1(nodes_[ind0].neighbours_[rand_n].first);
+        nodes_loc.insert(ind1);
+        ind0 = ind1;
+      }
+
+    }
+
+    std::set<std::size_t> nodes_tot_set;
+    for(const auto& a : nodes_tot)
+      std::copy( a.begin(), a.end(), std::inserter( nodes_tot_set, nodes_tot_set.end() ) );
+
+    for(const auto a : nodes_tot_set)
+      std::cout << a << std::endl;
+
+  }
+}
 
 void graph::add_similarity(const std::string property, const double threshold)
 {

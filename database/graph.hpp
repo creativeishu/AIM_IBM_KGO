@@ -64,7 +64,7 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
-  // std::string query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const;
+  void query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const;
 
   /**
    * Print out nodes connected to the looked-up one up to a certain depth

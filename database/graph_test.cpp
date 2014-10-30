@@ -14,9 +14,11 @@ int main()
   // const std::string query("Iron");
 
   const bool by_name(false);
-  const std::string sub_graph(G.query_graph(query,depth,by_name));
 
-  std::cout << sub_graph << std::endl;
+  //const std::string sub_graph(G.query_graph(query,depth,by_name));
+  // std::cout << sub_graph << std::endl;
+
+  G.query_graph_parallel(query,depth,by_name);
 
   return 0;
 }
