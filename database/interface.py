@@ -21,18 +21,21 @@ print 'Content-type: text/html\r\n\n'
 def process_query():
     val = str(form)
 # "ERROR: web form <node> not sent."
-    search_name=True
+    search_name = True
+    maxdepth = 1
     try:
         val = form["node"].value
         if 'id:' in val:
             search_name = False
             val = val.replace('id:', '')
             val = re.sub(r'___','/',val)
+        if 'depth' in form:
+            maxdepth = int(form['depth'].value)
     except:
         print "graph g { n [label=\"" + val +"\"]; }"
         return
     
-    query = '%d %s' % (search_name, val)
+    query = '%d %d %s' % (search_name, maxdepth, val)
     
     f = open(pipe_path, 'w')
     f.write(query)

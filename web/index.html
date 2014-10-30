@@ -12,9 +12,9 @@
         var network = new vis.Network(container,{},{ physics: {barnesHut: {springLength:75, springConstant:0.015}}
                                                     });
         
-        function load_graph(val) {
+        function load_graph(val, depth) {
             $.ajax({ type: "GET", url: '/cgi-bin/interface.py',
-                     data: {'node':val} }).done(function(data) {
+                     data: {'node':val, 'depth': depth} }).done(function(data) {
               network.setOptions({
                                     stabilize: false
                                  });
@@ -31,10 +31,10 @@
           });
         
         $( "#search-form" ).submit(function( event ) {
-            
             var val = $("#node-search-field").val();
-            load_graph(val);
-            history.pushState({node: val}, '', '#'+val);
+            var depth = $("#graph-depth-field").val();
+            load_graph(val, depth);
+            history.pushState({node: val, depth: depth}, '', '#'+val+'|'+depth);
             event.preventDefault();
         });
         
@@ -48,14 +48,21 @@
         
         var hash = parent.location.hash.replace("#", "");
         if (hash.length > 0) {
-            $("#node-search-field").val(hash);
-            $("#search-form").submit();
+          var res = hash.split("|");
+          
+          $("#node-search-field").val(res[0]);
+          $('#graph-depth-field option').removeAttr("selected");
+          $('#graph-depth-field option[value='+res[1]+']').attr('selected', 'selected');
+          
+          $("#search-form").submit();
         }
         
         window.onpopstate = function(event) {
             if (event.state != null) {
                 $("#node-search-field").val(event.state["node"]);
-                load_graph(event.state["node"]);
+                $('#graph-depth-field option').removeAttr("selected");
+                $('#graph-depth-field option[value='+event.state["depth"]+']').attr('selected', 'selected');
+                load_graph(event.state["node"], event.state["depth"]);
             }
         };
         
@@ -69,6 +76,12 @@
     <form id="search-form" action="#">
     <p>
         <input id="node-search-field" name="node" type="text" />
+        depth:
+        <select id="graph-depth-field" name="depth" type="text">
+          <option value="1" selected="true">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
         <input type="submit" value="load!" />
     <span>Example:</span>
     <span class="example_search"><a href=#>Metal</a></span>
