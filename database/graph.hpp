@@ -82,6 +82,12 @@ public:
       const std::size_t limit) const;
 
   /**
+   * Create additional edges based on similarities within given properties
+   * \param properties List of pairs of properties and threshold value
+   */
+  void create_property_edges(const std::vector<std::pair<std::string, double> > properties);
+
+  /**
    * Get the node corresponding to a given index
    */
   node_type get(size_t i) const

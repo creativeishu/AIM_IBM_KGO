@@ -53,11 +53,10 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
     const std::size_t ind1(find_node_id(std::get<2>(edge)));
     nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
   }
+}
 
-  const std::vector<std::pair<std::string,double> > properties({
-      std::make_pair("melting_point",0.05)
-        });
-
+void graph::create_property_edges(const std::vector<std::pair<std::string, double> > properties)
+{
   for(const auto& a : properties)
     add_similarity(a.first,a.second);
 }
