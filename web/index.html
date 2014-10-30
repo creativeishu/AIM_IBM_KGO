@@ -13,7 +13,7 @@
                                                     });
         
         function load_graph(val) {
-            $.ajax({ type: "GET", url: 'http://127.0.0.1/cgi-bin/interface.py',
+            $.ajax({ type: "GET", url: '/cgi-bin/interface.py',
                      data: {'node':val} }).done(function(data) {
               network.setOptions({
                                     stabilize: false
