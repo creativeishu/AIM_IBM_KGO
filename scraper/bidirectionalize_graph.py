@@ -10,7 +10,8 @@ def main(args):
 
     #list here :        bad id      good id
     edges_to_bidirectionalize = {
-            "subclass_of./engineering/material/parent_material_class": "child_material_of_class" 
+            "subclass_of./engineering/material/parent_material_class": "child_material_of_class" ,
+            "category./chemistry/chemical_element/chemical_series" : "member_of_chemical_series"
             }
 
     edges = json.load(open(edge_file))
@@ -21,8 +22,9 @@ def main(args):
 
     for edge in edges:
         if edge[1] in edges_to_bidirectionalize.keys():
-            if not [edge[2],edges_to_bidirectionalize[edge[1]],edge[0]] in edges:
-                edges.append([edge[2],edges_to_bidirectionalize[edge[1]],edge[0]])
+           # print props[edge[0]]['name'], "=>", edge[1], ' => ', props[edge[2]]['name']
+            edges.append([edge[2],edges_to_bidirectionalize[edge[1]],edge[0]])
+           #print "appended"
 
     json.dump(edges, open('bidir_edges.txt','w'),indent=2)
     json.dump(props, open('bidir_props.txt','w'),indent=2)
