@@ -6,7 +6,8 @@
 #include <random>
 #include <omp.h>
 
-graph::graph(const std::string& graph_file, const std::string& properties_file)
+graph::graph(const std::string& graph_file, const std::string& properties_file, const bool undirected)
+  : undirected_(undirected)
 {
   EdgeFile ef(graph_file);
 
@@ -51,7 +52,12 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
   for(const auto& edge : edges){
     const std::size_t ind0(find_node_id(std::get<0>(edge)));
     const std::size_t ind1(find_node_id(std::get<2>(edge)));
-    nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
+    if(undirected && !nodes_[ind0].search_neighbour(ind1) && !nodes_[ind1].search_neighbour(ind0)){
+      nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
+      nodes_[ind1].neighbours_.push_back(std::make_pair(ind0,std::get<1>(edge)));
+    }
+    else if(!nodes_[ind0].search_neighbour(ind1))
+      nodes_[ind0].neighbours_.push_back(std::make_pair(ind1,std::get<1>(edge)));
   }
 }
 
@@ -226,13 +232,13 @@ void graph::add_similarity(const std::string property, const double threshold)
     long j;
 
     j = long(i)-1;
-    while(j >= 0 && std::fabs(vec[std::size_t(j)].value - value0) < threshold){
+    while(j >= 0 && std::fabs(vec[std::size_t(j)].value - value0) < threshold && !nodes_[ind0].search_neighbour(vec[std::size_t(j)].index)){
       nodes_[ind0].neighbours_.push_back(std::make_pair(vec[std::size_t(j)].index,property));
       --j;
     }
 
     j = long(i)+1;
-    while(j < long(vec.size()) && std::fabs(vec[std::size_t(j)].value - value0) < threshold){
+    while(j < long(vec.size()) && std::fabs(vec[std::size_t(j)].value - value0) < threshold && !nodes_[ind0].search_neighbour(vec[std::size_t(j)].index)){
       nodes_[ind0].neighbours_.push_back(std::make_pair(vec[std::size_t(j)].index,property));
       ++j;
     }
