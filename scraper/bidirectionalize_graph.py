@@ -14,6 +14,7 @@ def main(args):
             "category./chemistry/chemical_element/chemical_series" : "member_of_chemical_series",
             "narrower_than./chemistry/isotope/isotope_of":"is_isotope_of",
             "category./chemistry/chemical_compound/classifications":"is_chemical_compound",
+            "/chemistry/chemical_classification/chemicals_of_this_type":"is_chemical_type"
             }
 
     edges = json.load(open(edge_file))
