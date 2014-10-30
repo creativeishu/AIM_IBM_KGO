@@ -198,7 +198,7 @@ void graph::add_similarity(const std::string property, const double threshold)
 
 void graph::visit_nodes_bfs(
                             const std::size_t root,
-                            std::function<bool (const node_type &)> f,
+                            std::function<bool (size_t)> f,
                             const std::size_t depth) const
 {
   std::set<size_t> visited({ root });
@@ -211,7 +211,7 @@ void graph::visit_nodes_bfs(
       queue.pop();
 
       // call the function on the node and terminate if it returns false
-      if (!f(nodes_[t]))
+      if (!f(t))
         return;
 
       // do not add further neighbours since we reached maximum depth already
@@ -236,11 +236,56 @@ void graph::dump_nodes(const std::string& query, const std::size_t depth, const 
   if(index == nodes_.size())
     return;
 
-  auto printer = [](const node_type & node) {
-    std::cout << node.id_ << " (name: " << node.name_ << ")" << std::endl;
+  auto printer = [this](size_t node_index) {
+    std::cout << nodes_[node_index].id_ << " (name: " << nodes_[node_index].name_ << ")" << std::endl;
     return true;
   };
   visit_nodes_bfs(index, printer, depth);
+}
+
+std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
+      const std::string& query,
+      const std::size_t depth,
+      const bool by_name,
+      const std::string & property,
+      const std::size_t limit) const
+{
+  std::map<double,size_t> nodes_found;
+
+  const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
+  if(index == nodes_.size())
+    return nodes_found;
+
+  // check that at least the root node has the property
+  auto ref_p_i(nodes_[index].properties_.find(property));
+  if (ref_p_i == nodes_[index].properties_.end())
+    return nodes_found;
+
+  const double ref(stod(ref_p_i->second));
+
+  auto f = [this,ref,&nodes_found,&property,&limit](size_t n_i) {
+    // get an iterator to the wanted property
+    auto p_i(nodes_[n_i].properties_.find(property));
+
+    // ignore the node if the property does not exist
+    if (p_i == nodes_[n_i].properties_.end())
+      return true;
+
+    // do a sorted insert
+    const double v(std::stod(p_i->second));
+    nodes_found.emplace(std::abs(ref - v), n_i);
+
+    // reduce the length of the list to limit+1 (since the root node will always be part of it)
+    if (nodes_found.size() > (limit+1))
+      nodes_found.erase(--nodes_found.end());
+
+    // continue with the search
+    return true;
+  };
+
+  visit_nodes_bfs(index, f, depth);
+
+  return nodes_found;
 }
 
 std::size_t graph::find_node(const std::string& query) const

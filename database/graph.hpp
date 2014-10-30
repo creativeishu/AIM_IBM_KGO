@@ -10,6 +10,7 @@
 #include <cassert>
 #include <set>
 #include <unordered_map>
+#include <map>
 
 class graph
 {
@@ -70,6 +71,27 @@ public:
    */
   void dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const;
 
+  /**
+   * Find a limited set of nodes based on property comparison (currently assumed to be a double)
+   */
+  std::map<double,size_t> find_nodes_closest_by_property_comparison(
+      const std::string& query,
+      const std::size_t depth,
+      const bool by_name,
+      const std::string & property,
+      const std::size_t limit) const;
+
+  /**
+   * Get the node corresponding to a given index
+   */
+  node_type get(size_t i) const
+  {
+    if (i >= nodes_.size())
+      return node_type("INVALID");
+
+    return nodes_[i];
+  }
+
 private:
 
   void add_similarity(const std::string property, const double threshold);
@@ -80,7 +102,7 @@ private:
 
   void visit_nodes_bfs(
       const std::size_t root,
-      std::function<bool (const node_type &)> f,
+      std::function<bool (size_t)> f,
       const std::size_t depth = std::numeric_limits<size_t>::max()
   ) const;
 
