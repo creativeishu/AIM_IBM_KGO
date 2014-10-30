@@ -8,6 +8,7 @@
 #include "thirdparty/rapidjson/document.h"
 
 EdgeFile::EdgeFile(const std::string & filename) :
+  filename_(filename),
   fh_(nullptr),
   is_(nullptr)
 {
@@ -24,7 +25,7 @@ void EdgeFile::load(std::function<bool (const std::string &, const std::string &
   rapidjson::Document d;
 
   if (d.ParseStream(*is_).HasParseError())
-    throw std::runtime_error("invalid json");
+    throw std::runtime_error(std::string("invalid json in: " + filename_));
 
   if (!d.IsArray())
     throw std::runtime_error("Root element is not an array");
@@ -48,6 +49,7 @@ EdgeFile::~EdgeFile()
 }
 
 PropertiesFile::PropertiesFile(const std::string & filename) :
+  filename_(filename),
   fh_(nullptr),
   is_(nullptr)
 {
@@ -64,7 +66,7 @@ void PropertiesFile::load(std::function<bool (const std::string &, PropertyConta
   rapidjson::Document d;
 
   if (d.ParseStream(*is_).HasParseError())
-    throw std::runtime_error("invalid json");
+    throw std::runtime_error(std::string("invalid json in: " + filename_));
 
   if (!d.IsObject())
     throw std::runtime_error("Root element is not an object");
