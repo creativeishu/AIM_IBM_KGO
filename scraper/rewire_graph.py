@@ -7,6 +7,7 @@ def main(args):
     edge_file = args[0]
     prop_file = args[1]
 
+
     #list here :        bad id      good id
     ids_to_replace = [("/m/02kctdj" ,"/m/025rsfk"),
                       ("/m/0bnvbd4",  "/m/025rw19" ),
@@ -22,14 +23,36 @@ def main(args):
                       ("/m/0ggk3fn",  "/m/06x4c"   ),
                       ("/m/02kcr3f",  "/m/025tkrf" ),
                       ("/m/02kcjvf",  "/m/025tkqy" )]
-
-    bad_ids = [x[0] for x in ids_to_replace]
+    ids_to_replace = []
 
     edges = json.load(open(edge_file))
     props = json.load(open(prop_file))
     assert (type(edges)==list)    
     assert (type(props)==dict)    
-    print type(props)
+
+    for x in props:
+        if len( props[x]['name']) > 25:
+            props[x]['name'] = props[x]['name'][0:10]+"..."
+        print props[x]['name']
+
+    all_names = [props[x]['name'] for x in props]
+    all_names_unique = set(all_names)
+    for name in all_names_unique:
+        dupl_names = []
+        for k,prop in props.items():
+            if prop['name']==name:
+                dupl_names.append(k)
+        if len(dupl_names)>1:
+            root_prop = dupl_names[0]
+            print len(props[root_prop].keys()),props[root_prop].keys()
+            for x in dupl_names[1:]:
+                z = dict(props[root_prop].items() + props[x].items())
+                props[root_prop] = z
+                ids_to_replace.append((x,root_prop))
+            print len(props[root_prop].keys()),props[root_prop].keys()
+            print "===="
+
+    bad_ids = [x[0] for x in ids_to_replace]
 
     for edge in edges:
         for f,r in ids_to_replace:
