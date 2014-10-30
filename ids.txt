@@ -1,0 +1,9 @@
+#GoodID				GarbageID
+ "/m/025rsfk"		"/m/02kctdj"
+ "/m/025rw19"		"/m/0bnvbd4"
+ "/m/025rw19"		"/m/02kcv_c"
+ "/m/025svlc"		"/m/0bnv6p5"
+ "/m/025s7j4"		"/m/02kcq04"
+ "/m/025sf9q"		"/m/02kcqln"
+ "/m/05_f5y5"		"/m/063z0gk"
+ 
