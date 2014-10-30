@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <tuple>
-#include <regex>
 #include <stack>
 #include <random>
 #include <omp.h>
@@ -136,28 +135,24 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
   return sub_graph;
 }
 
-void graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const
+std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const
 {
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
 
+  std::vector<std::size_t> indices_tot_vec;
+
   if(index == nodes_.size()){
     std::cout << "NODE NOT FOUND" << std::endl;
-    return;
+    return indices_tot_vec;
   }
 
-  double value0;
-  bool found(false);
-  for(const auto a : nodes_[index].properties_)
-    if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
-      value0 = std::stod(a.second);
-      found = true;
-      break;
-    }
-
-  if(!found){
+  const auto it0(nodes_[index].find_property(property));
+  if(it0 == nodes_[index].properties_.end()){
     std::cout << "NODE PROPERTY NOT FOUND" << std::endl;
-    return;
+    return indices_tot_vec;
   }
+
+  const auto value0(std::stod(it0->second));
 
   std::size_t num_threads;
 #pragma omp parallel
@@ -166,7 +161,7 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
     num_threads = omp_get_num_threads();
   }
 
-  std::vector<std::set<std::size_t> > nodes_tot(num_threads);
+  std::vector<std::set<std::size_t> > indices_tot(num_threads);
 
 #pragma omp parallel
   {
@@ -175,9 +170,9 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
     std::mt19937 generator(thread_num);
     const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
 
-    auto& nodes_loc(nodes_tot[thread_num]);
+    auto& indices_loc(indices_tot[thread_num]);
 
-    nodes_loc.insert(index);
+    indices_loc.insert(index);
     std::size_t ind0(index);
     for(std::size_t d = 0; d <= depth; ++d){
       const std::size_t ns(nodes_[ind0].neighbours_.size());
@@ -185,17 +180,9 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
         const std::size_t rand_n(rng()%ns);
         const std::size_t ind1(nodes_[ind0].neighbours_[rand_n].first);
 
-        double value1;
-        bool found(false);
-        for(const auto a : nodes_[ind1].properties_)
-          if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
-            value1 = std::stod(a.second);
-            found = true;
-            break;
-          }
-
-        if(std::fabs(value1 - value0) < threshold)
-          nodes_loc.insert(ind1);
+        const auto it1(nodes_[ind1].find_property(property));
+        if(it1 != nodes_[ind1].properties_.end() && std::fabs(std::stod(it1->second) - value0) < threshold)
+          indices_loc.insert(ind1);
 
         ind0 = ind1;
       }
@@ -203,23 +190,23 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
 
   }
 
-  std::set<std::size_t> nodes_tot_set;
-  for(const auto& a : nodes_tot)
-    std::copy( a.begin(), a.end(), std::inserter( nodes_tot_set, nodes_tot_set.end() ) );
+  std::set<std::size_t> indices_tot_set;
+  for(const auto& a : indices_tot)
+    std::copy( a.begin(), a.end(), std::inserter( indices_tot_set, indices_tot_set.end() ) );
 
-  for(const auto a : nodes_tot_set)
-    std::cout << nodes_[a].name_ << ' ' << nodes_[a].find_property(property)->second << std::endl;
+  indices_tot_vec.assign(indices_tot_set.begin(),indices_tot_set.end());
+
+  return indices_tot_vec;
 }
 
 void graph::add_similarity(const std::string property, const double threshold)
 {
   std::vector<prop_type> vec;
-  for(std::size_t ind = 0; ind < nodes_.size(); ++ind)
-    for(const auto a : nodes_[ind].properties_)
-      if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
-        vec.push_back(prop_type(ind,std::stod(a.second)));
-        break;
-      }
+  for(std::size_t ind = 0; ind < nodes_.size(); ++ind){
+    const auto it(nodes_[ind].find_property(property));
+    if(it != nodes_[ind].properties_.end())
+      vec.push_back(prop_type(ind,std::stod(it->second)));
+  }
 
   std::sort(vec.begin(),vec.end(),std::less<prop_type>());
 
