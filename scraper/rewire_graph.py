@@ -24,12 +24,16 @@ def main(args):
 
     all_names = [props[x]['name'] for x in props]
     all_names_unique = set(all_names)
+    print len(all_names), len(all_names_unique)
+    quit()
     for name in all_names_unique:
         dupl_names = []
         for k,prop in props.items():
             if prop['name'].lower()==name.lower():
                 dupl_names.append(k)
         if len(dupl_names)>1:
+            print "HAVE DUPLICATE NAMES"
+            quit()
             root_prop = dupl_names[0]
             print len(props[root_prop].keys()),props[root_prop].keys()
             for x in dupl_names[1:]:
