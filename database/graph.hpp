@@ -80,7 +80,7 @@ private:
 
   void visit_nodes_bfs(
       const std::size_t root,
-      std::function<bool (const node_type &)> f,
+      std::function<bool (size_t)> f,
       const std::size_t depth = std::numeric_limits<size_t>::max()
   ) const;
 

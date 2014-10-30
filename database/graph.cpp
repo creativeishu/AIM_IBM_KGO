@@ -205,7 +205,7 @@ void graph::visit_nodes_bfs(
       queue.pop();
 
       // call the function on the node and terminate if it returns false
-      if (!f(nodes_[t]))
+      if (!f(t))
         return;
 
       // do not add further neighbours since we reached maximum depth already
@@ -230,8 +230,8 @@ void graph::dump_nodes(const std::string& query, const std::size_t depth, const 
   if(index == nodes_.size())
     return;
 
-  auto printer = [](const node_type & node) {
-    std::cout << node.id_ << " (name: " << node.name_ << ")" << std::endl;
+  auto printer = [this](size_t node_index) {
+    std::cout << nodes_[node_index].id_ << " (name: " << nodes_[node_index].name_ << ")" << std::endl;
     return true;
   };
   visit_nodes_bfs(index, printer, depth);
