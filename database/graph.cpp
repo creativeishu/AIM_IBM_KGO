@@ -67,6 +67,8 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
   if(index == nodes_.size())
     return "graph G { nf [label=\"NOT FOUND\"]; }";
 
+  const size_t max_label_length(20);
+
   std::string sub_graph = "graph G {\n";
 
   std::set<std::size_t> indices_tot({index});
@@ -77,9 +79,14 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
     for(const auto ind0 : indices0) {
       sub_graph += nodes_[ind0].id_;
       sub_graph += " [";
-      sub_graph += "label=\"" + nodes_[ind0].name_ + "\"";
       
-      std::string title_str = "";
+      std::string n_label(nodes_[ind0].name_);
+      std::string title_str = n_label + "<br />";
+
+      if (n_label.length() > max_label_length)
+        n_label.replace(max_label_length/2, n_label.length() - max_label_length, "...");
+      sub_graph += "label=\"" + n_label + "\"";
+
       node_type::PropertyContainer::const_iterator match;
       
       match = nodes_[ind0].find_property("melting_point");
@@ -108,6 +115,8 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
           const std::size_t ind1(b.first);
           if(indices_tot.find(ind1) == indices_tot.end()){
             std::string label(b.second);
+            if (label.length() > max_label_length)
+              label.replace(max_label_length/2, label.length() - max_label_length, "...");
             indices_tot.insert(ind1);
             sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
             indices1.push_back(ind1);
