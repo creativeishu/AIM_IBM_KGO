@@ -204,7 +204,7 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
     std::copy( a.begin(), a.end(), std::inserter( nodes_tot_set, nodes_tot_set.end() ) );
 
   for(const auto a : nodes_tot_set)
-    std::cout << nodes_[a].name_ << ' ' << *get_property(a,property) << std::endl;
+    std::cout << nodes_[a].name_ << ' ' << nodes_[a].get_property(property)->second << std::endl;
 }
 
 void graph::add_similarity(const std::string property, const double threshold)
@@ -309,8 +309,9 @@ std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
   if(index == nodes_.size())
     return nodes_found;
 
-  // check that at least the root node has the property
-  auto ref_p_i(nodes_[index].properties_.find(property));
+  // check that at least the root node has a matching property and use that one
+  const auto ref_p_i(nodes_[index].get_property(property));
+
   if (ref_p_i == nodes_[index].properties_.end())
     return nodes_found;
 
@@ -318,7 +319,7 @@ std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
 
   auto f = [this,ref,&nodes_found,&property,&limit](size_t n_i) {
     // get an iterator to the wanted property
-    auto p_i(nodes_[n_i].properties_.find(property));
+    const auto p_i(nodes_[n_i].get_property(property));
 
     // ignore the node if the property does not exist
     if (p_i == nodes_[n_i].properties_.end())
