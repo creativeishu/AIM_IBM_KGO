@@ -22,25 +22,24 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -g")
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -pg -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_OPENMP -fopenmp") # enable OpenMP
 
+add_library(graph parse.cpp graph.cpp)
+
 add_executable(parse_TEST
     parse_TEST.cpp
-    parse.cpp
-    )
+  )
+target_link_libraries(parse_TEST graph)
 
 add_executable(daemon
     daemon.cpp
-    parse.cpp
-    graph.cpp
-    )
+  )
+target_link_libraries(daemon graph)
 
 add_executable(graph_test
     graph_test.cpp
-    parse.cpp
-    graph.cpp
-    )
+  )
+target_link_libraries(graph_test graph)
 
 add_executable(graph_deterministic
     graph_deterministic.cpp
-    parse.cpp
-    graph.cpp
-    )
+  )
+target_link_libraries(graph_deterministic graph)

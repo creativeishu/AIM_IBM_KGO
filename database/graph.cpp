@@ -81,25 +81,16 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
         std::string title_str = "";
         node_type::PropertyContainer::const_iterator match;
         
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/melting_point");
+        match = nodes_[ind0].find_property("melting_point");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/boiling_point");
+        match = nodes_[ind0].find_property("boiling_point");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/melting_point");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/boiling_point");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_element/atomic_mass");
+        match = nodes_[ind0].find_property("atomic_mass");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/chemical_compound/atomic_mass");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].properties_.find("measurement./chemistry/isotope/mass");
+        match = nodes_[ind0].find_property("isotope\/mass");
         if (match != nodes_[ind0].properties_.end())
           title_str += "Mass : " + match->second + "u<br />";
         
@@ -158,6 +149,7 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
 
   std::size_t num_threads;
 #pragma omp parallel
+#pragma omp master
   {
     num_threads = omp_get_num_threads();
   }
@@ -204,7 +196,7 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
     std::copy( a.begin(), a.end(), std::inserter( nodes_tot_set, nodes_tot_set.end() ) );
 
   for(const auto a : nodes_tot_set)
-    std::cout << nodes_[a].name_ << ' ' << *get_property(a,property) << std::endl;
+    std::cout << nodes_[a].name_ << ' ' << nodes_[a].find_property(property)->second << std::endl;
 }
 
 void graph::add_similarity(const std::string property, const double threshold)
@@ -309,8 +301,9 @@ std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
   if(index == nodes_.size())
     return nodes_found;
 
-  // check that at least the root node has the property
-  auto ref_p_i(nodes_[index].properties_.find(property));
+  // check that at least the root node has a matching property and use that one
+  const auto ref_p_i(nodes_[index].find_property(property));
+
   if (ref_p_i == nodes_[index].properties_.end())
     return nodes_found;
 
@@ -318,7 +311,7 @@ std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
 
   auto f = [this,ref,&nodes_found,&property,&limit](size_t n_i) {
     // get an iterator to the wanted property
-    auto p_i(nodes_[n_i].properties_.find(property));
+    const auto p_i(nodes_[n_i].find_property(property));
 
     // ignore the node if the property does not exist
     if (p_i == nodes_[n_i].properties_.end())

@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <map>
 #include <functional>
+#include <regex>
 
 class graph
 {
@@ -28,17 +29,14 @@ class graph
     bool operator<(const std::string& in) const {return ((this->id_).compare(in) < 0);}
     bool operator==(const node_type& in) const {return this->id_ == in.id_;}
 
-    PropertyContainer::const_iterator get_property(const std::size_t index, const std::string property) const
+    PropertyContainer::const_iterator find_property(const std::string & property) const
     {
-      double value;
-      bool found(false);
-      for(const auto a : properties_)
-        if(){
-          value = std::stod(a.second);
-          found = true;
-          break;
-        }
-      return std::make_pair(value,found);
+      const auto prop_match(std::regex(".*" + property + ".*"));
+      return std::find_if(
+        properties_.begin(),
+        properties_.end(),
+        [&prop_match](const std::pair<std::string, std::string> & p) { return std::regex_match(p.first, prop_match); }
+        );
     }
 
     //*******
