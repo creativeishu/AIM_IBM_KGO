@@ -90,6 +90,9 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
 
       node_type::PropertyContainer::const_iterator match;
       
+      match = nodes_[ind0].find_property("smiles_svg");
+      if (match != nodes_[ind0].properties_.end())
+        title_str += match->second + "<br />";
       match = nodes_[ind0].find_property("melting_point");
       if (match != nodes_[ind0].properties_.end())
         title_str += "Melting T : " + match->second + " °C<br />";
