@@ -8,8 +8,8 @@ def main(args):
     prop_file = args[1]
 
     #comment out to skip vvvv
-    #recompute_nodes_without_props(edge_file, prop_file)
-
+    recompute_nodes_without_props(edge_file, prop_file)
+    quit()
     #open nodes without props
     with open('nodes_without_props.txt', 'r') as infile:
         nodes_without_props = json.load(infile)
