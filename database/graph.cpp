@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <tuple>
-#include <regex>
 #include <stack>
 #include <random>
 #include <omp.h>
@@ -142,19 +141,13 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
     return;
   }
 
-  double value0;
-  bool found(false);
-  for(const auto a : nodes_[index].properties_)
-    if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
-      value0 = std::stod(a.second);
-      found = true;
-      break;
-    }
-
-  if(!found){
+  const auto it0(nodes_[index].find_property(property));
+  if(it0 == nodes_[index].properties_.end()){
     std::cout << "NODE PROPERTY NOT FOUND" << std::endl;
     return;
   }
+
+  const auto value0(std::stod(it0->second));
 
   std::size_t num_threads;
 #pragma omp parallel
@@ -182,16 +175,8 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
         const std::size_t rand_n(rng()%ns);
         const std::size_t ind1(nodes_[ind0].neighbours_[rand_n].first);
 
-        double value1;
-        bool found(false);
-        for(const auto a : nodes_[ind1].properties_)
-          if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
-            value1 = std::stod(a.second);
-            found = true;
-            break;
-          }
-
-        if(std::fabs(value1 - value0) < threshold)
+        const auto it1(nodes_[ind1].find_property(property));
+        if(it1 != nodes_[ind1].properties_.end() && std::fabs(std::stod(it1->second) - value0) < threshold)
           nodes_loc.insert(ind1);
 
         ind0 = ind1;
@@ -211,12 +196,11 @@ void graph::query_graph_parallel(const std::string& query, const std::size_t dep
 void graph::add_similarity(const std::string property, const double threshold)
 {
   std::vector<prop_type> vec;
-  for(std::size_t ind = 0; ind < nodes_.size(); ++ind)
-    for(const auto a : nodes_[ind].properties_)
-      if(std::regex_match (a.first, std::regex("(.*)(" + property + ")(.*)"))){
-        vec.push_back(prop_type(ind,std::stod(a.second)));
-        break;
-      }
+  for(std::size_t ind = 0; ind < nodes_.size(); ++ind){
+    const auto it(nodes_[ind].find_property(property));
+    if(it != nodes_[ind].properties_.end())
+      vec.push_back(prop_type(ind,std::stod(it->second)));
+  }
 
   std::sort(vec.begin(),vec.end(),std::less<prop_type>());
 
