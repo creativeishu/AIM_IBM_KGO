@@ -34,14 +34,15 @@ graph::graph(const std::string& graph_file, const std::string& properties_file)
       if(ind == nodes_.size())
         return true;
 
-      for(const auto a : props)
-        if(std::regex_match (a.first, std::regex("(name)(.*)"))){
-          const std::string name(a.second);
-          nodes_[ind].name_ = name;
-          // lookup_name_.insert(std::make_pair(name,ind));
-          lookup_name_.emplace(name,ind);
-          break;
-        }
+      // look for a property 'name'
+      const auto name_prop_i(props.find("name"));
+      if (name_prop_i != props.end())
+      {
+        // save it in the node itself for display
+        nodes_[ind].name_ = name_prop_i->second;
+        // cache the name in a lookup table
+        lookup_name_.emplace(name_prop_i->second, ind);
+      }
 
       nodes_[ind].properties_ = props;
 
