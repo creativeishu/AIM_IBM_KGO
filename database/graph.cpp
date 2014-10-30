@@ -91,7 +91,7 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
       match = nodes_[ind0].find_property("atomic_mass");
       if (match != nodes_[ind0].properties_.end())
         title_str += "Mass : " + match->second + "u<br />";
-      match = nodes_[ind0].find_property("isotope\\/mass");
+      match = nodes_[ind0].find_property("isotope/mass");
       if (match != nodes_[ind0].properties_.end())
         title_str += "Mass : " + match->second + "u<br />";
       
