@@ -114,13 +114,14 @@ public:
     return nodes_.size();
   }
 
+  std::size_t find_node_id(const std::string&) const;
+  std::size_t find_node_name(const std::string&) const;
+  
 private:
 
   void add_similarity(const std::string property, const double threshold);
 
   std::size_t find_node(const std::string&) const;
-  std::size_t find_node_id(const std::string&) const;
-  std::size_t find_node_name(const std::string&) const;
 
   void visit_nodes_bfs(
       const std::size_t root,

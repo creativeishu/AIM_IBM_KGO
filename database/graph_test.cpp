@@ -15,14 +15,20 @@ int main()
         });
   G.create_property_edges(properties);
 
-  const std::string query("/m/0lbt3");
+  const std::string query("/m/059gn");
   //const std::string query("Iron");
 
   const bool by_name(false);
 
   //const std::string sub_graph(G.query_graph(query,depth,by_name));
   //std::cout << sub_graph << std::endl;
-
+  
+  std::cout << "Total size : " << G.count() << std::endl;
+  
+  std::size_t ix = G.find_node_id(query);
+  std::cout << "Found " << ix << std::endl;
+  std::cout << "It is : " << G.get(ix).find_property("name")->second << std::endl;
+  
   G.query_graph_parallel(query,depth,"melting_point",120.0,by_name);
 
   return 0;
