@@ -81,6 +81,17 @@ public:
       const std::string & property,
       const std::size_t limit) const;
 
+  /**
+   * Get the node corresponding to a given index
+   */
+  node_type get(size_t i) const
+  {
+    if (i >= nodes_.size())
+      return node_type("INVALID");
+
+    return nodes_[i];
+  }
+
 private:
 
   void add_similarity(const std::string property, const double threshold);
