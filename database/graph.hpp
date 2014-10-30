@@ -7,10 +7,10 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <cassert>
 #include <set>
 #include <unordered_map>
 #include <map>
+#include <functional>
 
 class graph
 {
