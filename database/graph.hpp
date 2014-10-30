@@ -7,9 +7,10 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <cassert>
 #include <set>
 #include <unordered_map>
+#include <map>
+#include <functional>
 
 class graph
 {
@@ -63,14 +64,41 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
+  // std::string query_graph_parallel(const std::string& query, const std::size_t depth, const bool by_name) const;
+
   /**
    * Print out nodes connected to the looked-up one up to a certain depth
    */
   void dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const;
 
-private:
+  /**
+   * Find a limited set of nodes based on property comparison (currently assumed to be a double)
+   */
+  std::map<double,size_t> find_nodes_closest_by_property_comparison(
+      const std::string& query,
+      const std::size_t depth,
+      const bool by_name,
+      const std::string & property,
+      const std::size_t limit) const;
 
-  void build_sub_graph(const std::vector<std::size_t>&, const std::size_t, std::set<std::size_t>&, std::string&) const;
+  /**
+   * Create additional edges based on similarities within given properties
+   * \param properties List of pairs of properties and threshold value
+   */
+  void create_property_edges(const std::vector<std::pair<std::string, double> > properties);
+
+  /**
+   * Get the node corresponding to a given index
+   */
+  node_type get(size_t i) const
+  {
+    if (i >= nodes_.size())
+      return node_type("INVALID");
+
+    return nodes_[i];
+  }
+
+private:
 
   void add_similarity(const std::string property, const double threshold);
 
@@ -80,7 +108,7 @@ private:
 
   void visit_nodes_bfs(
       const std::size_t root,
-      std::function<bool (const node_type &)> f,
+      std::function<bool (size_t)> f,
       const std::size_t depth = std::numeric_limits<size_t>::max()
   ) const;
 

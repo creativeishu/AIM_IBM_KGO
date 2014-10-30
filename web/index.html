@@ -6,11 +6,24 @@
     <script src="libs/jquery-1.11.1.min.js"></script>
     
     <script>
+    
     $(function (){
         var container = document.getElementById('mygraph');
         var network = new vis.Network(container,{},{ physics: {barnesHut: {springLength:75, springConstant:0.015}}
                                                     });
-
+        
+        function load_graph(val) {
+            $.ajax({ type: "GET", url: 'http://127.0.0.1/cgi-bin/interface.py',
+                     data: {'node':val} }).done(function(data) {
+              network.setOptions({
+                                    stabilize: false
+                                 });
+              network.setData({
+                                dot: data
+                              });
+            });
+        }
+        
           network.on('doubleClick', function(properties) {
             var selected_node = properties["nodes"][0];
             $("#node-search-field").val("id:"+selected_node);
@@ -20,16 +33,9 @@
         $( "#search-form" ).submit(function( event ) {
             
             var val = $("#node-search-field").val();
-            $.ajax({type: "GET", url: 'http://127.0.0.1/cgi-bin/interface.py', data: {'node':val}}).done(function(data) {
-              network.setOptions({
-                                    stabilize: false
-                                 });
-              network.setData({
-                                dot: data
-                              });
-            });
-            
-          event.preventDefault();
+            load_graph(val);
+            history.pushState({node: val}, '', '#'+val);
+            event.preventDefault();
         });
         
         $(".example_search a").click(function() {
@@ -38,6 +44,20 @@
             $("#search-form").submit();
             return false;
         });
+        
+        
+        var hash = parent.location.hash.replace("#", "");
+        if (hash.length > 0) {
+            $("#node-search-field").val(hash);
+            $("#search-form").submit();
+        }
+        
+        window.onpopstate = function(event) {
+            if (event.state != null) {
+                $("#node-search-field").val(event.state["node"]);
+                load_graph(event.state["node"]);
+            }
+        };
         
     });
     </script>
