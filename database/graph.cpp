@@ -64,58 +64,57 @@ void graph::create_property_edges(const std::vector<std::pair<std::string, doubl
 std::string graph::query_graph(const std::string& query, const std::size_t depth, const bool by_name) const
 {
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
-  std::string sub_graph = "graph G {\n";
   if(index == nodes_.size())
-    sub_graph += "nf [label=\"NOT FOUND\"];\n";
-  else{
-    std::set<std::size_t> indices_tot({index});
-    std::vector<std::size_t> indices0({index});
+    return "graph G { nf [label=\"NOT FOUND\"]; }";
 
-    for(std::size_t d = 0; d <= depth; ++d){
+  std::string sub_graph = "graph G {\n";
 
-      for(const auto ind0 : indices0) {
-        sub_graph += nodes_[ind0].id_;
-        sub_graph += " [";
-        sub_graph += "label=\"" + nodes_[ind0].name_ + "\"";
-        
-        std::string title_str = "";
-        node_type::PropertyContainer::const_iterator match;
-        
-        match = nodes_[ind0].find_property("melting_point");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Melting T : " + match->second + " °C<br />";
-        match = nodes_[ind0].find_property("boiling_point");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Boiling T : " + match->second + " °C<br />";
-        match = nodes_[ind0].find_property("atomic_mass");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Mass : " + match->second + "u<br />";
-        match = nodes_[ind0].find_property("isotope\\/mass");
-        if (match != nodes_[ind0].properties_.end())
-          title_str += "Mass : " + match->second + "u<br />";
-        
-        if (!title_str.empty())
-          sub_graph += " title=\""+ title_str + "\"";
-        
-        sub_graph += "];\n";
-      }
+  std::set<std::size_t> indices_tot({index});
+  std::vector<std::size_t> indices0({index});
 
-      if(d < depth){
-        std::vector<std::size_t> indices1;
-        for(const auto ind0 : indices0)
-          for(const auto b : nodes_[ind0].neighbours_){
-            const std::size_t ind1(b.first);
-            if(indices_tot.find(ind1) == indices_tot.end()){
-              const std::string label(b.second);
-              indices_tot.insert(ind1);
-              sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
-              indices1.push_back(ind1);
-            }
+  for(std::size_t d = 0; d <= depth; ++d){
+
+    for(const auto ind0 : indices0) {
+      sub_graph += nodes_[ind0].id_;
+      sub_graph += " [";
+      sub_graph += "label=\"" + nodes_[ind0].name_ + "\"";
+      
+      std::string title_str = "";
+      node_type::PropertyContainer::const_iterator match;
+      
+      match = nodes_[ind0].find_property("melting_point");
+      if (match != nodes_[ind0].properties_.end())
+        title_str += "Melting T : " + match->second + " °C<br />";
+      match = nodes_[ind0].find_property("boiling_point");
+      if (match != nodes_[ind0].properties_.end())
+        title_str += "Boiling T : " + match->second + " °C<br />";
+      match = nodes_[ind0].find_property("atomic_mass");
+      if (match != nodes_[ind0].properties_.end())
+        title_str += "Mass : " + match->second + "u<br />";
+      match = nodes_[ind0].find_property("isotope\\/mass");
+      if (match != nodes_[ind0].properties_.end())
+        title_str += "Mass : " + match->second + "u<br />";
+      
+      if (!title_str.empty())
+        sub_graph += " title=\""+ title_str + "\"";
+      
+      sub_graph += "];\n";
+    }
+
+    if(d < depth){
+      std::vector<std::size_t> indices1;
+      for(const auto ind0 : indices0)
+        for(const auto b : nodes_[ind0].neighbours_){
+          const std::size_t ind1(b.first);
+          if(indices_tot.find(ind1) == indices_tot.end()){
+            std::string label(b.second);
+            indices_tot.insert(ind1);
+            sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
+            indices1.push_back(ind1);
           }
+        }
 
-        std::swap(indices0,indices1);
-      }
-
+      std::swap(indices0,indices1);
     }
 
   }
