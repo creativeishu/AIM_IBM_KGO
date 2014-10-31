@@ -301,30 +301,30 @@ void graph::visit_nodes_bfs(
   std::stack<std::vector<size_t>> queue({std::vector<size_t>({root})}); // to get the path of the nodes, we need the full path
 
   while (!queue.empty())
+  {
+    std::vector<size_t> p = queue.top();
+    queue.pop();
+
+    // call the function on the path and terminate if it returns false
+    if (!f(p))
+      return;
+
+    // do not add further neighbours since we reached maximum depth already
+    if (p.size() > depth)
+      continue;
+
+    for (size_t n(0); n < nodes_[p.back()].neighbours_.size(); ++n)
     {
-      std::vector<size_t> p = queue.top();
-      queue.pop();
-
-      // call the function on the path and terminate if it returns false
-      if (!f(p))
-        return;
-
-      // do not add further neighbours since we reached maximum depth already
-      if (p.size() > depth)
-        continue;
-
-      for (size_t n(0); n < nodes_[p.back()].neighbours_.size(); ++n)
-        {
-          size_t n_i(nodes_[p.back()].neighbours_[n].first);
-          if (visited.find(n_i) == visited.end())
-            {
-              visited.emplace(n_i);
-              std::vector<size_t> n_p(p);
-              n_p.push_back(n_i);
-              queue.push(n_p);
-            }
-        }
+      size_t n_i(nodes_[p.back()].neighbours_[n].first);
+      if (visited.find(n_i) == visited.end())
+      {
+        visited.emplace(n_i);
+        std::vector<size_t> n_p(p);
+        n_p.push_back(n_i);
+        queue.push(n_p);
+      }
     }
+  }
 }
 
 void graph::dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const
