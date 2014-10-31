@@ -248,7 +248,7 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
 
   int num_threads;
 #pragma omp parallel
-#pragma omp master#
+#pragma omp master
 #ifdef _OMP
   {
     num_threads = omp_get_num_threads();
