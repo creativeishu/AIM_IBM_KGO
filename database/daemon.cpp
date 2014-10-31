@@ -23,6 +23,11 @@ int main(int argc, char* argv[])
   const std::string graph_file(argv[1]);
   const std::string properties_file(argv[2]);
   const graph G(graph_file,properties_file);
+  graph G_sim(graph_file,properties_file);
+  
+  std::vector<std::pair<std::string, double> > properties;
+  properties.push_back( std::make_pair("melting_point", 0.05) );
+  G_sim.create_property_edges(properties);
   
   while(1)
   {
