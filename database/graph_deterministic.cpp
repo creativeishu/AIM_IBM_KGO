@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     << "QUERY" << std::endl
     << "=====" << std::endl
     << std::endl
-    << "node-name:    " << query << std::endl
+    << "node-name:    " << query << " (resulting id: " << G.get(G.find_node_name(query)).id_ << ")" << std::endl
     << "property:     " << property << std::endl
     << "depth-limit:  " << depth << std::endl
     << "result-limit: " << limit << std::endl;
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     const auto & n(G.get(p.second.back()));
     const double v(std::stod(n.find_property(property)->second));
     std::cout << n.name_ << ": " <<  v << " (delta: " << p.first << ")" << std::endl;
-    std::cout << "  " << query;
+    std::cout << "  " << G.get(*p.second.begin()).name_ << " (" << G.get(*p.second.begin()).id_ << ")";
     for (auto i(p.second.begin()+1); i != p.second.end(); ++i)
       std::cout << " -> " << G.get(*i).name_ << " (" << G.get(*i).id_ << ")";
     std::cout << std::endl;
