@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <tuple>
-#include <stack>
+#include <queue>
 #include <random>
 #ifdef _OMP
     #include <omp.h>
@@ -310,11 +310,11 @@ void graph::visit_nodes_bfs(
                             const std::size_t depth) const
 {
   std::set<size_t> visited({ root }); // to track the visited nodes, the index is enough
-  std::stack<std::vector<size_t>> queue({std::vector<size_t>({root})}); // to get the path of the nodes, we need the full path
+  std::queue<std::vector<size_t>> queue({std::vector<size_t>({root})}); // to get the path of the nodes, we need the full path
 
   while (!queue.empty())
   {
-    std::vector<size_t> p = queue.top();
+    std::vector<size_t> p = queue.front();
     queue.pop();
 
     // call the function on the path and terminate if it returns false
