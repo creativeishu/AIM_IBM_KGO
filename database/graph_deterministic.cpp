@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     std::cout << n.name_ << ": " <<  v << " (delta: " << e.first << ")" << std::endl;
     std::cout << "  " << query;
     for (auto i(e.second.begin()+1); i != e.second.end(); ++i)
-      std::cout << " -> " << G.get(*i).name_;
+      std::cout << " -> " << G.get(*i).name_ << " (" << G.get(*i).id_ << ")";
     std::cout << std::endl;
   }
 
