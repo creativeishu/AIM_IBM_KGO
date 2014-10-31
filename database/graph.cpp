@@ -75,7 +75,7 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
 
   const size_t max_label_length(20);
 
-  std::string sub_graph = "graph G {\n";
+  std::string sub_graph = "digraph G {\n";
 
   std::set<std::size_t> indices_tot({index});
   std::vector<std::size_t> indices0({index});
@@ -122,14 +122,13 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
       for(const auto ind0 : indices0)
         for(const auto b : nodes_[ind0].neighbours_){
           const std::size_t ind1(b.first);
-          if(indices_tot.find(ind1) == indices_tot.end()){
-            std::string label(b.second);
-            if (label.length() > max_label_length)
-              label.replace(max_label_length/2, label.length() - max_label_length, "...");
-            indices_tot.insert(ind1);
-            sub_graph += nodes_[ind0].id_ + " -- " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
+          if(indices_tot.find(ind1) == indices_tot.end())
             indices1.push_back(ind1);
-          }
+          std::string label(b.second);
+          if (label.length() > max_label_length)
+            label.replace(max_label_length/2, label.length() - max_label_length, "...");
+          indices_tot.insert(ind1);
+          sub_graph += nodes_[ind0].id_ + " -> " + nodes_[ind1].id_ + " [label=\"" + label + "\"];\n";
         }
 
       std::swap(indices0,indices1);
@@ -141,7 +140,7 @@ std::string graph::query_graph(const std::string& query, const std::size_t depth
   return sub_graph;
 }
 
-std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const
+std::vector<std::size_t> graph::query_graph_exact(const std::string& query, const std::size_t N, const std::string property, const bool by_name) const
 {
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
 
@@ -160,25 +159,61 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
 
   const auto value0(std::stod(it0->second));
 
-  std::size_t num_threads;
+  std::vector<prop_type> vec;
+  for(std::size_t ind = 0; ind < nodes_.size(); ++ind){
+    const auto it(nodes_[ind].find_property(property));
+    if(it != nodes_[ind].properties_.end())
+      vec.push_back(prop_type(ind,std::fabs(std::stod(it->second)-value0)));
+  }
+
+  std::sort(vec.begin(),vec.end(),std::less<prop_type>());
+
+  for(unsigned i = 0; i < N && i < vec.size(); ++i)
+    indices_tot_vec.push_back(vec[i].index);
+
+  return indices_tot_vec;
+}
+
+std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const
+{
+  const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
+
+  std::vector<std::size_t> indices_tot_vec;
+
+  if(index == nodes_.size()){
+    std::cout << "NODE NOT FOUND" << std::endl;
+    return indices_tot_vec;
+  }
+
+  const auto it0(nodes_[index].find_property(property));
+  if(it0 == nodes_[index].properties_.end()){
+    std::cout << "NODE PROPERTY NOT FOUND" << std::endl;
+    return indices_tot_vec;
+  }
+
+  const auto value0(std::stod(it0->second));
+
+  int num_threads;
 #pragma omp parallel
 #pragma omp master
   {
     num_threads = omp_get_num_threads();
   }
 
-  std::vector<std::set<std::size_t> > indices_tot(num_threads);
+  std::vector<std::set<prop_type> > indices_tot(num_threads);
 
 #pragma omp parallel
   {
-    const unsigned thread_num(omp_get_thread_num());
+    omp_set_num_threads(num_threads);
+    const int thread_num(omp_get_thread_num());
 
     std::mt19937 generator(thread_num);
     const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
 
     auto& indices_loc(indices_tot[thread_num]);
+    std::set<std::size_t> visited_nodes;
 
-    indices_loc.insert(index);
+    indices_loc.insert(prop_type(index,0.0));
     std::size_t ind0(index);
     for(std::size_t d = 0; d <= depth; ++d){
       const std::size_t ns(nodes_[ind0].neighbours_.size());
@@ -187,8 +222,15 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
         const std::size_t ind1(nodes_[ind0].neighbours_[rand_n].first);
 
         const auto it1(nodes_[ind1].find_property(property));
-        if(it1 != nodes_[ind1].properties_.end() && std::fabs(std::stod(it1->second) - value0) < threshold)
-          indices_loc.insert(ind1);
+        if(it1 != nodes_[ind1].properties_.end() && visited_nodes.find(ind1) == visited_nodes.end()){
+          indices_loc.insert(prop_type(ind1,std::fabs(std::stod(it1->second) - value0)));
+          if(indices_loc.size()>N){
+            auto it(indices_loc.end());
+            --it;
+            indices_loc.erase(it);
+          }
+          visited_nodes.insert(ind1);
+        }
 
         ind0 = ind1;
       }
@@ -196,11 +238,15 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
 
   }
 
-  std::set<std::size_t> indices_tot_set;
+  std::set<prop_type> indices_tot_set;
   for(const auto& a : indices_tot)
     std::copy( a.begin(), a.end(), std::inserter( indices_tot_set, indices_tot_set.end() ) );
 
-  indices_tot_vec.assign(indices_tot_set.begin(),indices_tot_set.end());
+  for(const auto a : indices_tot_set){
+    indices_tot_vec.push_back(a.index);
+    if(indices_tot_vec.size() >= N)
+      break;
+  }
 
   return indices_tot_vec;
 }
@@ -248,36 +294,37 @@ void graph::add_similarity(const std::string property, const double threshold)
 
 void graph::visit_nodes_bfs(
                             const std::size_t root,
-                            std::function<bool (size_t)> f,
+                            std::function<bool (const std::vector<size_t> &)> f,
                             const std::size_t depth) const
 {
-  std::set<size_t> visited({ root });
-  std::stack<std::pair<size_t,size_t>> queue({ std::make_pair(root, 0) });
+  std::set<size_t> visited({ root }); // to track the visited nodes, the index is enough
+  std::stack<std::vector<size_t>> queue({std::vector<size_t>({root})}); // to get the path of the nodes, we need the full path
 
   while (!queue.empty())
+  {
+    std::vector<size_t> p = queue.top();
+    queue.pop();
+
+    // call the function on the path and terminate if it returns false
+    if (!f(p))
+      return;
+
+    // do not add further neighbours since we reached maximum depth already
+    if (p.size() > depth)
+      continue;
+
+    for (size_t n(0); n < nodes_[p.back()].neighbours_.size(); ++n)
     {
-      size_t t(0), d(0);
-      std::tie(t, d) = queue.top();
-      queue.pop();
-
-      // call the function on the node and terminate if it returns false
-      if (!f(t))
-        return;
-
-      // do not add further neighbours since we reached maximum depth already
-      if (d >= depth)
-        continue;
-
-      for (size_t n(0); n < nodes_[t].neighbours_.size(); ++n)
-        {
-          size_t n_i(nodes_[t].neighbours_[n].first);
-          if (visited.find(n_i) == visited.end())
-            {
-              visited.emplace(n_i);
-              queue.emplace(n_i, d+1);
-            }
-        }
+      size_t n_i(nodes_[p.back()].neighbours_[n].first);
+      if (visited.find(n_i) == visited.end())
+      {
+        visited.emplace(n_i);
+        std::vector<size_t> n_p(p);
+        n_p.push_back(n_i);
+        queue.push(n_p);
+      }
     }
+  }
 }
 
 void graph::dump_nodes(const std::string& query, const std::size_t depth, const bool by_name) const
@@ -286,21 +333,24 @@ void graph::dump_nodes(const std::string& query, const std::size_t depth, const 
   if(index == nodes_.size())
     return;
 
-  auto printer = [this](size_t node_index) {
-    std::cout << nodes_[node_index].id_ << " (name: " << nodes_[node_index].name_ << ")" << std::endl;
+  auto printer = [this](const std::vector<size_t> & node_path) {
+    std::cout << nodes_[node_path.front()].id_;
+    for (auto i(node_path.begin()+1); i != node_path.end(); ++i)
+      std::cout << " -> " << nodes_[*i].id_ << " (name: " << nodes_[*i].name_ << ")";
+    std::cout << std::endl;
     return true;
   };
   visit_nodes_bfs(index, printer, depth);
 }
 
-std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
+std::map<double,std::vector<size_t> > graph::find_nodes_closest_by_property_comparison(
       const std::string& query,
       const std::size_t depth,
       const bool by_name,
       const std::string & property,
       const std::size_t limit) const
 {
-  std::map<double,size_t> nodes_found;
+  std::map<double,std::vector<size_t> > nodes_found;
 
   const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
   if(index == nodes_.size())
@@ -314,17 +364,17 @@ std::map<double,size_t> graph::find_nodes_closest_by_property_comparison(
 
   const double ref(stod(ref_p_i->second));
 
-  auto f = [this,ref,&nodes_found,&property,&limit](size_t n_i) {
+  auto f = [this,ref,&nodes_found,&property,&limit](const std::vector<size_t> n_p) {
     // get an iterator to the wanted property
-    const auto p_i(nodes_[n_i].find_property(property));
+    const auto p_i(nodes_[n_p.back()].find_property(property));
 
     // ignore the node if the property does not exist
-    if (p_i == nodes_[n_i].properties_.end())
+    if (p_i == nodes_[n_p.back()].properties_.end())
       return true;
 
     // do a sorted insert
     const double v(std::stod(p_i->second));
-    nodes_found.emplace(std::abs(ref - v), n_i);
+    nodes_found.emplace(std::abs(ref - v), n_p);
 
     // reduce the length of the list to limit+1 (since the root node will always be part of it)
     if (nodes_found.size() > (limit+1))

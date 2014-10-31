@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
   const std::string query(argv[1]);
   const std::string property(argv[2]);
 
+  //G.dump_nodes(query, depth, by_name);
+
   std::cout << std::endl;
   std::cout << "QUERY" << std::endl;
   std::cout << "=====" << std::endl << std::endl;
@@ -57,9 +59,13 @@ int main(int argc, char *argv[])
 
   for (auto e: nodes)
   {
-    const auto & n(G.get(e.second));
+    const auto & n(G.get(e.second.back()));
     const double v(std::stod(n.find_property(property)->second));
     std::cout << n.name_ << ": " <<  v << " (delta: " << e.first << ")" << std::endl;
+    std::cout << "  " << query;
+    for (auto i(e.second.begin()+1); i != e.second.end(); ++i)
+      std::cout << " -> " << G.get(*i).name_ << " (" << G.get(*i).id_ << ")";
+    std::cout << std::endl;
   }
 
   std::cout << std::endl;

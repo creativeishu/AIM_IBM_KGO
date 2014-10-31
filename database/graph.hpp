@@ -83,7 +83,9 @@ public:
    */
   std::string query_graph(const std::string& query, const std::size_t depth, const bool by_name) const;
 
-  std::vector<std::size_t> query_graph_parallel(const std::string& query, const std::size_t depth, const std::string property, const double threshold, const bool by_name) const;
+  std::vector<std::size_t> query_graph_parallel(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const;
+
+  std::vector<std::size_t> query_graph_exact(const std::string& query, const std::size_t N, const std::string property, const bool by_name) const;
 
   /**
    * Print out nodes connected to the looked-up one up to a certain depth
@@ -92,8 +94,9 @@ public:
 
   /**
    * Find a limited set of nodes based on property comparison (currently assumed to be a double)
+   * \return A map of the calculated distance to the respective path leading to this node
    */
-  std::map<double,size_t> find_nodes_closest_by_property_comparison(
+  std::map<double,std::vector<size_t> > find_nodes_closest_by_property_comparison(
       const std::string& query,
       const std::size_t depth,
       const bool by_name,
@@ -133,7 +136,7 @@ private:
 
   void visit_nodes_bfs(
       const std::size_t root,
-      std::function<bool (size_t)> f,
+      std::function<bool (const std::vector<size_t> &)> f,
       const std::size_t depth = std::numeric_limits<size_t>::max()
   ) const;
 
