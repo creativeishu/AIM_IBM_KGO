@@ -131,6 +131,8 @@ public:
 
   std::size_t find_node_id(const std::string&) const;
   std::size_t find_node_name(const std::string&) const;
+
+  double compute_error(const std::string& query, const std::string property, const bool by_name, const std::vector<std::size_t>& indices) const;
   
 private:
 

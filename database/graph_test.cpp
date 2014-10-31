@@ -39,15 +39,24 @@ int main()
   // for(const auto a : indices_exact)
   //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
+  const double delta_exact(G.compute_error(query,property,by_name,indices_exact));
+
+  std::cout << "delta exact: " << delta_exact << std::endl;
+
   std::cout << "----------" << std::endl;
 
   const std::size_t depth(32);
 
-  for(std::size_t depth = 4; depth = 4096; depth *= 2){
+  for(std::size_t depth = 4; depth <= 8192; depth *= 2){
 
     const auto indices1(G.query_graph_parallel(query,depth,N,property,by_name));
-    for(const auto a : indices1)
-      std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+
+    const double delta(G.compute_error(query,property,by_name,indices1));
+
+    std::cout << depth << ' ' << delta << std::endl;
+
+    // for(const auto a : indices1)
+    //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
   }
 

@@ -210,10 +210,19 @@ std::vector<std::size_t> graph::query_graph_exact(const std::string& query, cons
   return indices_tot_vec;
 }
 
-double compute_error() const
+double graph::compute_error(const std::string& query, const std::string property, const bool by_name, const std::vector<std::size_t>& indices) const
 {
+  const std::size_t index(by_name ? find_node_name(query) : find_node_id(query));
+  const auto it0(nodes_[index].find_property(property));
+  const auto value0(std::stod(it0->second));
 
+  double delta(0.0);
+  for(const auto a : indices)
+    delta += std::fabs(value0 - std::stod(nodes_[a].find_property(property)->second));
 
+  delta /= indices.size();
+
+  return delta;
 }
 
 std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const
