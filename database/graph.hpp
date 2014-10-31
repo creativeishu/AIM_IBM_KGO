@@ -57,6 +57,8 @@ class graph
 
   struct prop_type
   {
+    prop_type(){}
+
     prop_type(const std::size_t ind, const double val)
       : index(ind)
       , value(val)
@@ -86,6 +88,8 @@ public:
   std::vector<std::size_t> query_graph_parallel(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const;
 
   std::vector<std::size_t> query_graph_exact(const std::string& query, const std::size_t N, const std::string property, const bool by_name) const;
+
+  std::vector<std::size_t> query_graph_random(const std::string& query, const std::size_t depth, const std::size_t N, const std::string property, const bool by_name) const;
 
   /**
    * Print out nodes connected to the looked-up one up to a certain depth
@@ -131,8 +135,6 @@ public:
 private:
 
   void add_similarity(const std::string property, const double threshold);
-
-  std::size_t find_node(const std::string&) const;
 
   void visit_nodes_bfs(
       const std::size_t root,

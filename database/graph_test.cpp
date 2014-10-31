@@ -4,7 +4,6 @@
 
 int main()
 {
-  const std::size_t depth(1024);
   const std::string graph_file("../../edges_test.txt");
   const std::string properties_file("../../props_test.txt");
 
@@ -33,17 +32,30 @@ int main()
   
   const std::string property("melting_point");
 
-  const std::size_t N(16);
+  const std::size_t N(8);
 
   const auto indices_exact(G.query_graph_exact(query,N,property,by_name));
-  for(const auto a : indices_exact)
-    std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+
+  // for(const auto a : indices_exact)
+  //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
   std::cout << "----------" << std::endl;
 
-  const auto indices0(G.query_graph_parallel(query,depth,N,property,by_name));
-  for(const auto a : indices0)
-    std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+  const std::size_t depth(32);
+
+  for(std::size_t depth = 4; depth = 4096; depth *= 2){
+
+    const auto indices1(G.query_graph_parallel(query,depth,N,property,by_name));
+    for(const auto a : indices1)
+      std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+
+  }
+
+  // std::cout << "----------" << std::endl;
+
+  // const auto indices0(G.query_graph_random(query,depth,N,property,by_name));
+  // for(const auto a : indices0)
+  //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
   return 0;
 }
