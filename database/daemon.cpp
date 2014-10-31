@@ -32,21 +32,24 @@ int main(int argc, char* argv[])
   while(1)
   {
       // Get the query
-    bool by_name;
+    bool by_name, with_prop_links;
     int depth;
     std::string query;
     std::ifstream ifs(pipe_path);
-    ifs >> by_name >> depth;
+    ifs >> by_name >> depth >> with_prop_links;
     getline(ifs, query);
     ifs.close();
     trim(query);
     std::cout << "By name  " << by_name << std::endl;
     std::cout << "Depth    " << depth << std::endl;
+    std::cout << "Props l. " << with_prop_links << std::endl;
     std::cout << "Received " << query << std::endl;
     
       // Reply to query
       // const bool by_name(false);
-    const std::string res = G.query_graph(query,depth,by_name);
+    std::string res;
+    if (with_prop_links) res = G_sim.query_graph(query,depth,by_name);
+    else                 res = G.query_graph(query,depth,by_name);
     std::ofstream ofs(pipe_path);
     ofs << res;
     ofs.close();

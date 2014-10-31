@@ -23,6 +23,7 @@ def process_query():
 # "ERROR: web form <node> not sent."
     search_name = True
     maxdepth = 1
+    props_links = 0
     try:
         val = form["node"].value
         if 'id:' in val:
@@ -31,11 +32,13 @@ def process_query():
             val = re.sub(r'___','/',val)
         if 'depth' in form:
             maxdepth = int(form['depth'].value)
+        if 'props_links' in form:
+            props_links = int(form['props_links'].value)
     except:
         print "graph g { n [label=\"" + val +"\"]; }"
         return
     
-    query = '%d %d %s' % (search_name, maxdepth, val)
+    query = '%d %d %d %s' % (search_name, maxdepth, props_links, val)
     
     f = open(pipe_path, 'w')
     f.write(query)
