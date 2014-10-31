@@ -40,38 +40,54 @@ int main(int argc, char *argv[])
 
   //G.dump_nodes(query, depth, by_name);
 
-  std::cout << std::endl;
-  std::cout << "QUERY" << std::endl;
-  std::cout << "=====" << std::endl << std::endl;
+  std::cout
+    << std::endl
+    << "QUERY" << std::endl
+    << "=====" << std::endl
+    << std::endl
+    << "node-name:    " << query << std::endl
+    << "property:     " << property << std::endl
+    << "depth-limit:  " << depth << std::endl
+    << "result-limit: " << limit << std::endl;
 
-  std::cout << "node-name:    " << query << std::endl;
-  std::cout << "property:     " << property << std::endl;
-  std::cout << "depth-limit:  " << depth << std::endl;
-  std::cout << "result-limit: " << limit << std::endl;
-
-  std::cout << std::endl;
-  std::cout << "RESULTS" << std::endl;
-  std::cout << "=======" << std::endl << std::endl;
+  std::cout
+    << std::endl
+    << "RESULTS" << std::endl
+    << "=======" << std::endl
+    << std::endl;
 
   c.tick();
-  const auto & nodes(G.find_nodes_closest_by_property_comparison(query, depth, by_name, property, limit));
+  const auto & paths(G.find_nodes_closest_by_property_comparison(query, depth, by_name, property, limit));
+  std::vector<size_t> nodes; // needed to reuse the error calculation function
   double search_time(c.tock());
 
-  for (auto e: nodes)
+  for (auto p: paths)
   {
-    const auto & n(G.get(e.second.back()));
+    nodes.push_back(p.second.back());
+    const auto & n(G.get(p.second.back()));
     const double v(std::stod(n.find_property(property)->second));
-    std::cout << n.name_ << ": " <<  v << " (delta: " << e.first << ")" << std::endl;
+    std::cout << n.name_ << ": " <<  v << " (delta: " << p.first << ")" << std::endl;
     std::cout << "  " << query;
-    for (auto i(e.second.begin()+1); i != e.second.end(); ++i)
+    for (auto i(p.second.begin()+1); i != p.second.end(); ++i)
       std::cout << " -> " << G.get(*i).name_ << " (" << G.get(*i).id_ << ")";
     std::cout << std::endl;
   }
 
-  std::cout << std::endl;
-  std::cout << "TIMING" << std::endl;
-  std::cout << "======" << std::endl << std::endl;
-  std::cout << "loading: " << load_time << std::endl;
-  std::cout << "search:  " << search_time << std::endl;
+  std::cout
+    << std::endl
+    << "TIMING" << std::endl
+    << "======" << std::endl
+    << std::endl
+    << "loading [s]: " << load_time << std::endl
+    << "search [s]:  " << search_time << std::endl;
+
+  std::cout
+    << std::endl
+    << "ERRORS" << std::endl
+    << "======" << std::endl
+    << std::endl
+    << "MAE: "  << G.compute_error(query, property, by_name, nodes) << std::endl
+    << std::endl;
+
   return 0;
 }
