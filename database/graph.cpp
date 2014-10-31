@@ -4,7 +4,9 @@
 #include <tuple>
 #include <stack>
 #include <random>
-#include <omp.h>
+#ifdef _OMP
+    #include <omp.h>
+#endif 
 
 graph::graph(const std::string& graph_file, const std::string& properties_file, const bool undirected)
   : undirected_(undirected)
@@ -195,17 +197,27 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
 
   int num_threads;
 #pragma omp parallel
-#pragma omp master
+#pragma omp master#
+#ifdef _OMP
   {
     num_threads = omp_get_num_threads();
   }
+#else
+  {
+    num_threads = 1;
+  }
+#endif
 
   std::vector<std::set<prop_type> > indices_tot(num_threads);
 
 #pragma omp parallel
   {
+#ifdef _OMP
     omp_set_num_threads(num_threads);
     const int thread_num(omp_get_thread_num());
+#else
+    const int thread_num(1);
+#endif
 
     std::mt19937 generator(thread_num);
     const std::function<std::size_t()> rng(std::bind(std::uniform_int_distribution<std::size_t>(0, nodes_.size()), std::ref(generator)));
