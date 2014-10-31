@@ -32,7 +32,14 @@ int main(int argc, char *argv[])
   ClockMeasure c;
 
   c.tick();
-  const graph G(graph_file, properties_file);
+  graph G(graph_file, properties_file);
+
+#if 1
+  std::vector<std::pair<std::string, double> > properties;
+  properties.push_back( std::make_pair("melting_point", 0.004) );
+  G.create_property_edges(properties);
+#endif
+
   double load_time(c.tock());
 
   const std::string query(argv[1]);
