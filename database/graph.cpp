@@ -222,7 +222,7 @@ double graph::compute_error(const std::string& query, const std::string property
   for(const auto a : indices)
     delta += std::fabs(value0 - std::stod(nodes_[a].find_property(property)->second));
 
-  delta /= indices.size();
+  delta /= static_cast<double>(indices.size());
 
   return delta;
 }
