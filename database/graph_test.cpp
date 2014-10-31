@@ -36,8 +36,8 @@ int main()
 
   const auto indices_exact(G.query_graph_exact(query,N,property,by_name));
 
-  // for(const auto a : indices_exact)
-  //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+  for(const auto a : indices_exact)
+    std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
   const double delta_exact(G.compute_error(query,property,by_name,indices_exact));
 
@@ -45,7 +45,7 @@ int main()
 
   std::cout << "----------" << std::endl;
 
-  const std::size_t depth(32);
+  // const std::size_t depth(32);
 
   for(std::size_t depth = 4; depth <= 8192; depth *= 2){
 

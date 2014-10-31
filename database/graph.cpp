@@ -267,7 +267,7 @@ std::vector<std::size_t> graph::query_graph_parallel(const std::string& query, c
     omp_set_num_threads(num_threads);
     const int thread_num(omp_get_thread_num());
 #else
-    const int thread_num(1);
+    const int thread_num(0);
 #endif
 
     std::mt19937 generator(thread_num);
