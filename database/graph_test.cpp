@@ -16,8 +16,8 @@ int main()
   //       });
   // G.create_property_edges(properties);
 
-  const std::string query("/m/03cl_tj");
-  //const std::string query("Iron");
+  const std::string query("/m/02kcv_c");
+  // const std::string query("Iron");
 
   const bool by_name(false);
 
@@ -32,12 +32,12 @@ int main()
   
   const std::string property("melting_point");
 
-  const std::size_t N(8);
+  const std::size_t N(10);
 
   const auto indices_exact(G.query_graph_exact(query,N,property,by_name));
 
   for(const auto a : indices_exact)
-    std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+    std::cout << G.get(a).name_ << ' ' << std::stod(G.get(a).find_property(property)->second) << std::endl;
 
   const double delta_exact(G.compute_error(query,property,by_name,indices_exact));
 
@@ -47,18 +47,18 @@ int main()
 
   // const std::size_t depth(32);
 
-  for(std::size_t depth = 4; depth <= 8192; depth *= 2){
+  // for(std::size_t depth = 4; depth <= 8192; depth *= 2){
 
-    const auto indices1(G.query_graph_parallel(query,depth,N,property,by_name));
+  //   const auto indices1(G.query_graph_parallel(query,depth,N,property,by_name));
 
-    const double delta(G.compute_error(query,property,by_name,indices1));
+  //   const double delta(G.compute_error(query,property,by_name,indices1));
 
-    std::cout << depth << ' ' << delta << std::endl;
+  //   std::cout << depth << ' ' << delta << std::endl;
 
-    // for(const auto a : indices1)
-    //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
+  //   // for(const auto a : indices1)
+  //   //   std::cout << G.get(a).name_ << ' ' << G.get(a).find_property(property)->second << std::endl;
 
-  }
+  // }
 
   // std::cout << "----------" << std::endl;
 
